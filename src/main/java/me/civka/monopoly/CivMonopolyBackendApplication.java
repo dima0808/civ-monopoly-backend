@@ -9,5 +9,4 @@ public class CivMonopolyBackendApplication {
   public static void main(String[] args) {
     SpringApplication.run(CivMonopolyBackendApplication.class, args);
   }
-
 }
