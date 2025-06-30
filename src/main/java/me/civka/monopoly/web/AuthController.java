@@ -1,5 +1,11 @@
 package me.civka.monopoly.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.user.UserJwtTokenDto;
@@ -19,15 +25,31 @@ public class AuthController {
 
   private final AuthService authService;
 
+  @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+      @ApiResponse(responseCode = "400", description = "Invalid credentials")
+  })
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public UserJwtTokenDto login(@Valid @RequestBody UserRequestDto userRequestDto) {
+  public UserJwtTokenDto login(
+      @Parameter(description = "User login request", required = true,
+          content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
+      @Valid @RequestBody UserRequestDto userRequestDto) {
     return authService.login(userRequestDto);
   }
 
+  @Operation(summary = "User registration", description = "Registers a new user and returns a JWT token.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "User registered"),
+      @ApiResponse(responseCode = "400", description = "Invalid registration data")
+  })
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
-  public UserJwtTokenDto register(@Valid @RequestBody UserRequestDto userRequestDto) {
+  public UserJwtTokenDto register(
+      @Parameter(description = "User registration request", required = true,
+          content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
+      @Valid @RequestBody UserRequestDto userRequestDto) {
     return authService.register(userRequestDto);
   }
 }
