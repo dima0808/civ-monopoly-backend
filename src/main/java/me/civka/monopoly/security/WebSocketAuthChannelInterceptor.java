@@ -18,16 +18,16 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
   @Override
   public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-//    TODO: private and room chats access control
-//    if (accessor.getCommand() == StompCommand.SUBSCRIBE) {
-//
-//      Authentication authentication =
-//          authService.authenticate(accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION));
-//
-//      if (authentication == null) {
-//        return null;
-//      }
-//    }
+    //    TODO: private and room chats access control
+    //    if (accessor.getCommand() == StompCommand.SUBSCRIBE) {
+    //
+    //      Authentication authentication =
+    //          authService.authenticate(accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION));
+    //
+    //      if (authentication == null) {
+    //        return null;
+    //      }
+    //    }
 
     return message;
   }
