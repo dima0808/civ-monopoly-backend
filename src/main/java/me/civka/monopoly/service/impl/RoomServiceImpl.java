@@ -26,11 +26,12 @@ import me.civka.monopoly.service.RoomService;
 import me.civka.monopoly.service.exception.ChatNotFoundException;
 import me.civka.monopoly.service.exception.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
+import me.civka.monopoly.service.exception.MemberNotFoundException;
+import me.civka.monopoly.service.exception.MemberNotInRoomException;
 import me.civka.monopoly.service.exception.RoomIsFullException;
 import me.civka.monopoly.service.exception.RoomNotFoundException;
 import me.civka.monopoly.service.exception.UserAlreadyInRoomException;
 import me.civka.monopoly.service.exception.UserNotAllowedException;
-import me.civka.monopoly.service.exception.UserNotInRoomException;
 import me.civka.monopoly.service.mapper.RoomMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -147,26 +148,26 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public RoomDto kickUser(UUID userReference) {
+  public RoomDto kickMember(UUID memberReference) {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getReference();
+    UUID roomReference = owner.getMember().getRoom().getRoomReference();
     Room room =
         roomRepository
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
-    User userToKick =
-        userRepository
-            .findById(userReference)
-            .orElseThrow(() -> new UserNotInRoomException(room.getName(), userReference));
+    Member memberToKick =
+        memberRepository
+            .findById(memberReference)
+            .orElseThrow(() -> new MemberNotFoundException(memberReference));
 
     if (!room.getMembers().getFirst().getUser().equalsById(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
-    if (userToKick.getMember() == null || !userToKick.getMember().getRoom().equalsById(room)) {
-      throw new UserNotInRoomException(room.getName(), userReference);
+    if (memberToKick.getRoom().equalsById(room)) {
+      throw new MemberNotInRoomException(room.getName(), memberReference);
     }
 
-    unassignUserFromRoom(userToKick, room);
+    unassignUserFromRoom(memberToKick.getUser(), room);
 
     convertAndSendTo(
         List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);

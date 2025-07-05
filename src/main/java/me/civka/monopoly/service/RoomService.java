@@ -17,7 +17,7 @@ public interface RoomService {
 
   RoomDto leaveRoom();
 
-  RoomDto kickUser(UUID userReference);
+  RoomDto kickMember(UUID memberReference);
 
   @Deprecated
   void deleteRoom();

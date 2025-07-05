@@ -157,12 +157,12 @@ public class RoomController {
             description = "User or room not found",
             content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
       })
-  @PostMapping("/kick/{userReference}")
+  @PostMapping("/kick/{memberReference}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
-  public RoomDto kickUser(
-      @Parameter(description = "User reference UUID", required = true) @PathVariable
-          UUID userReference) {
-    return roomService.kickUser(userReference);
+  public RoomDto kickMember(
+      @Parameter(description = "Member reference UUID", required = true) @PathVariable
+          UUID memberReference) {
+    return roomService.kickMember(memberReference);
   }
 }
