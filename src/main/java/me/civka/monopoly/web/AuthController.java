@@ -26,30 +26,42 @@ public class AuthController {
   private final AuthService authService;
 
   @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
-      @ApiResponse(responseCode = "400", description = "Invalid credentials")
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+        @ApiResponse(responseCode = "400", description = "Invalid credentials")
+      })
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   public UserJwtTokenDto login(
-      @Parameter(description = "User login request", required = true,
-          content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
-      @Valid @RequestBody UserRequestDto userRequestDto) {
+      @Parameter(
+              description = "User login request",
+              required = true,
+              content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
+          @Valid
+          @RequestBody
+          UserRequestDto userRequestDto) {
     return authService.login(userRequestDto);
   }
 
-  @Operation(summary = "User registration", description = "Registers a new user and returns a JWT token.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "User registered"),
-      @ApiResponse(responseCode = "400", description = "Invalid registration data")
-  })
+  @Operation(
+      summary = "User registration",
+      description = "Registers a new user and returns a JWT token.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "User registered"),
+        @ApiResponse(responseCode = "400", description = "Invalid registration data")
+      })
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   public UserJwtTokenDto register(
-      @Parameter(description = "User registration request", required = true,
-          content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
-      @Valid @RequestBody UserRequestDto userRequestDto) {
+      @Parameter(
+              description = "User registration request",
+              required = true,
+              content = @Content(schema = @Schema(implementation = UserRequestDto.class)))
+          @Valid
+          @RequestBody
+          UserRequestDto userRequestDto) {
     return authService.register(userRequestDto);
   }
 }

@@ -11,12 +11,13 @@ import java.util.stream.Collectors;
 import me.civka.monopoly.service.exception.AuthorityNotFoundException;
 import me.civka.monopoly.service.exception.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
+import me.civka.monopoly.service.exception.MemberNotFoundException;
+import me.civka.monopoly.service.exception.MemberNotInRoomException;
 import me.civka.monopoly.service.exception.RoomIsFullException;
 import me.civka.monopoly.service.exception.RoomNotFoundException;
 import me.civka.monopoly.service.exception.UserAlreadyExistsException;
 import me.civka.monopoly.service.exception.UserAlreadyInRoomException;
 import me.civka.monopoly.service.exception.UserNotAllowedException;
-import me.civka.monopoly.service.exception.UserNotInRoomException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -48,9 +49,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     return getErrorResponseEntity(NOT_FOUND, "Room Not Found", ex);
   }
 
-  @ExceptionHandler(UserNotInRoomException.class)
-  public ResponseEntity<ProblemDetail> handleUserNotInRoomException(UserNotInRoomException ex) {
-    return getErrorResponseEntity(NOT_FOUND, "User Not In Room", ex);
+  @ExceptionHandler(MemberNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleMemberNotFoundException(MemberNotFoundException ex) {
+    return getErrorResponseEntity(NOT_FOUND, "Member Not Found", ex);
+  }
+
+  @ExceptionHandler(MemberNotInRoomException.class)
+  public ResponseEntity<ProblemDetail> handleMemberNotInRoomException(MemberNotInRoomException ex) {
+    return getErrorResponseEntity(NOT_FOUND, "Member Not In Room", ex);
   }
 
   @ExceptionHandler(UsernameNotFoundException.class)

@@ -23,11 +23,12 @@ import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.RoomService;
 import me.civka.monopoly.service.exception.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
+import me.civka.monopoly.service.exception.MemberNotFoundException;
+import me.civka.monopoly.service.exception.MemberNotInRoomException;
 import me.civka.monopoly.service.exception.RoomIsFullException;
 import me.civka.monopoly.service.exception.RoomNotFoundException;
 import me.civka.monopoly.service.exception.UserAlreadyInRoomException;
 import me.civka.monopoly.service.exception.UserNotAllowedException;
-import me.civka.monopoly.service.exception.UserNotInRoomException;
 import me.civka.monopoly.service.mapper.RoomMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,7 +101,8 @@ public class RoomServiceImpl implements RoomService {
 
     assignUserToRoom(user, room, false);
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.JOIN);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.JOIN);
 
     return roomMapper.toRoomDto(room);
   }
@@ -124,34 +126,36 @@ public class RoomServiceImpl implements RoomService {
       return null;
     }
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.LEAVE);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.LEAVE);
 
     return roomMapper.toRoomDto(room);
   }
 
   @Override
-  public RoomDto kickUser(UUID userReference) {
+  public RoomDto kickMember(UUID memberReference) {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     UUID roomReference = owner.getMember().getRoom().getRoomReference();
     Room room =
         roomRepository
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
-    User userToKick =
-        userRepository
-            .findById(userReference)
-            .orElseThrow(() -> new UserNotInRoomException(room.getName(), userReference));
+    Member memberToKick =
+        memberRepository
+            .findById(memberReference)
+            .orElseThrow(() -> new MemberNotFoundException(memberReference));
 
     if (!room.getMembers().getFirst().getUser().equalsById(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
-    if (userToKick.getMember() == null || !userToKick.getMember().getRoom().equalsById(room)) {
-      throw new UserNotInRoomException(room.getName(), userReference);
+    if (memberToKick.getRoom().equalsById(room)) {
+      throw new MemberNotInRoomException(room.getName(), memberReference);
     }
 
-    unassignUserFromRoom(userToKick, room);
+    unassignUserFromRoom(memberToKick.getUser(), room);
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);
 
     return roomMapper.toRoomDto(room);
   }
@@ -214,8 +218,7 @@ public class RoomServiceImpl implements RoomService {
 
   private void convertAndSendTo(String destination, Room room, MessageType type) {
     messagingTemplate.convertAndSend(
-        destination,
-        RoomMessage.builder().room(roomMapper.toRoomDto(room)).type(type).build());
+        destination, RoomMessage.builder().room(roomMapper.toRoomDto(room)).type(type).build());
   }
 
   private void convertAndSendTo(List<String> destinations, Room room, MessageType type) {
