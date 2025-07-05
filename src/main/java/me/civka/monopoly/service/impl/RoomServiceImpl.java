@@ -120,9 +120,7 @@ public class RoomServiceImpl implements RoomService {
 
     if (room.getMembers().isEmpty()) {
       roomRepository.deleteById(roomReference);
-
       convertAndSendTo("/topic/rooms", room, MessageType.DELETE);
-
       return null;
     }
 
@@ -148,7 +146,10 @@ public class RoomServiceImpl implements RoomService {
     if (!room.getMembers().getFirst().getUser().equalsById(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
-    if (memberToKick.getRoom().equalsById(room)) {
+    if (memberToKick.getUser().equalsById(owner)) {
+      throw new UserNotAllowedException("You cannot kick yourself from the room");
+    }
+    if (!memberToKick.getRoom().equalsById(room)) {
       throw new MemberNotInRoomException(room.getName(), memberReference);
     }
 
