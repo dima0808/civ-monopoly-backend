@@ -29,7 +29,7 @@ public class Member {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID memberReference;
+  private UUID reference;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

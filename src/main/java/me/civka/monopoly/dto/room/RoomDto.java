@@ -16,7 +16,7 @@ import me.civka.monopoly.dto.member.MemberDto;
 @Builder
 public class RoomDto {
 
-  private UUID roomReference;
+  private UUID reference;
   private String name;
   private Integer memberLimit;
   private List<MemberDto> members;

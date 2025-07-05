@@ -1,12 +1,12 @@
 package me.civka.monopoly.repository.entity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -24,35 +24,23 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "rooms")
-public class Room {
+@Table(name = "chats")
+public class Chat {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID reference;
 
-  @Column(nullable = false)
-  private String name;
+  @ManyToMany(fetch = FetchType.LAZY)
+  private List<User> users; // not null if private chat
 
-  @Column(nullable = false)
-  private Integer memberLimit;
-
-  private String password;
-
-  @Column(nullable = false)
-  private boolean isStarted;
-
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private Chat chat;
+  @OneToOne(fetch = FetchType.LAZY)
+  private Room room; // not null if public chat
 
   @OneToMany(
-      mappedBy = "room",
+      mappedBy = "chat",
       fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+      cascade = CascadeType.ALL,
       orphanRemoval = true)
-  private List<Member> members;
-
-  public boolean equalsById(Room room) {
-    return room != null && room.getReference().equals(reference);
-  }
+  private List<Message> messages;
 }

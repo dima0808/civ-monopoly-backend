@@ -1,5 +1,6 @@
-package me.civka.monopoly.dto.user;
+package me.civka.monopoly.dto.message;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +13,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UserDto {
+public class MessageDto {
 
   private UUID reference;
-  private String username;
+  private String message;
+  private OffsetDateTime timeStamp;
+  private String sender;
 }

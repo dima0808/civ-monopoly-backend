@@ -12,15 +12,18 @@ import me.civka.monopoly.dto.room.RoomDto;
 import me.civka.monopoly.dto.room.RoomListDto;
 import me.civka.monopoly.message.RoomMessage;
 import me.civka.monopoly.message.RoomMessage.MessageType;
+import me.civka.monopoly.repository.ChatRepository;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.RoomRepository;
 import me.civka.monopoly.repository.UserRepository;
+import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.Member;
 import me.civka.monopoly.repository.entity.Member.Civilization;
 import me.civka.monopoly.repository.entity.Member.Color;
 import me.civka.monopoly.repository.entity.Room;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.RoomService;
+import me.civka.monopoly.service.exception.ChatNotFoundException;
 import me.civka.monopoly.service.exception.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
 import me.civka.monopoly.service.exception.RoomIsFullException;
@@ -49,6 +52,7 @@ public class RoomServiceImpl implements RoomService {
   private final UserRepository userRepository;
   private final MemberRepository memberRepository;
   private final SimpMessagingTemplate messagingTemplate;
+  private final ChatRepository chatRepository;
 
   @Override
   public RoomListDto getAllRooms() {
@@ -57,10 +61,15 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public RoomDto getRoomByReference(UUID roomReference) {
-    return roomMapper.toRoomDto(
+    Room room =
         roomRepository
             .findById(roomReference)
-            .orElseThrow(() -> new RoomNotFoundException(roomReference)));
+            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+    room.setChat(
+        chatRepository
+            .findChatByRoomReference(roomReference)
+            .orElseThrow(() -> new ChatNotFoundException(roomReference)));
+    return roomMapper.toRoomDto(room);
   }
 
   @Override
@@ -72,9 +81,12 @@ public class RoomServiceImpl implements RoomService {
     }
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (user.getMember() != null) {
-      throw new UserAlreadyInRoomException(user.getUserReference());
+      throw new UserAlreadyInRoomException(user.getReference());
     }
-    Room room = roomRepository.save(roomMapper.toRoomEntity(roomCreateRequestDto));
+
+    Room room = roomMapper.toRoomEntity(roomCreateRequestDto);
+    room.setChat(Chat.builder().reference(room.getReference()).room(room).build());
+    roomRepository.save(room);
 
     assignUserToRoom(user, room, true);
 
@@ -100,7 +112,13 @@ public class RoomServiceImpl implements RoomService {
 
     assignUserToRoom(user, room, false);
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.JOIN);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.JOIN);
+
+    room.setChat(
+        chatRepository
+            .findChatByRoomReference(roomReference)
+            .orElseThrow(() -> new ChatNotFoundException(roomReference)));
 
     return roomMapper.toRoomDto(room);
   }
@@ -108,7 +126,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto leaveRoom() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = user.getMember().getRoom().getRoomReference();
+    UUID roomReference = user.getMember().getRoom().getReference();
     Room room =
         roomRepository
             .findById(roomReference)
@@ -118,13 +136,12 @@ public class RoomServiceImpl implements RoomService {
 
     if (room.getMembers().isEmpty()) {
       roomRepository.deleteById(roomReference);
-
       convertAndSendTo("/topic/rooms", room, MessageType.DELETE);
-
       return null;
     }
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.LEAVE);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.LEAVE);
 
     return roomMapper.toRoomDto(room);
   }
@@ -132,7 +149,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto kickUser(UUID userReference) {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getRoomReference();
+    UUID roomReference = owner.getMember().getRoom().getReference();
     Room room =
         roomRepository
             .findById(roomReference)
@@ -151,7 +168,8 @@ public class RoomServiceImpl implements RoomService {
 
     unassignUserFromRoom(userToKick, room);
 
-    convertAndSendTo(List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);
 
     return roomMapper.toRoomDto(room);
   }
@@ -159,7 +177,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public void deleteRoom() {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getRoomReference();
+    UUID roomReference = owner.getMember().getRoom().getReference();
     Room room =
         roomRepository
             .findById(roomReference)
@@ -214,8 +232,7 @@ public class RoomServiceImpl implements RoomService {
 
   private void convertAndSendTo(String destination, Room room, MessageType type) {
     messagingTemplate.convertAndSend(
-        destination,
-        RoomMessage.builder().room(roomMapper.toRoomDto(room)).type(type).build());
+        destination, RoomMessage.builder().room(roomMapper.toRoomDto(room)).type(type).build());
   }
 
   private void convertAndSendTo(List<String> destinations, Room room, MessageType type) {

@@ -1,8 +1,9 @@
 package me.civka.monopoly.service.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import me.civka.monopoly.repository.entity.Authority.AuthorityName;
 
-public class AuthorityNotFoundException extends RuntimeException {
+public class AuthorityNotFoundException extends EntityNotFoundException {
 
   private static final String MESSAGE = "Authority with name '%s' not found";
 

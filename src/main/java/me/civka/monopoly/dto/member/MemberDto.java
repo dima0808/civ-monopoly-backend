@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 public class MemberDto {
 
-  private UUID memberReference;
+  private UUID reference;
   private String civilization;
   private String color;
   private Integer gold;

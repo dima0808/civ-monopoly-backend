@@ -27,7 +27,7 @@ public class Authority implements GrantedAuthority {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID authorityReference;
+  private UUID reference;
 
   @Column(nullable = false, unique = true)
   @Enumerated(EnumType.STRING)
@@ -41,5 +41,6 @@ public class Authority implements GrantedAuthority {
   public enum AuthorityName {
     ROLE_USER,
     ROLE_ADMIN,
+    ROLE_MUTED,
   }
 }
