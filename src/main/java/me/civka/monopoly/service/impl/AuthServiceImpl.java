@@ -2,6 +2,7 @@ package me.civka.monopoly.service.impl;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.dto.user.UserDto;
 import me.civka.monopoly.dto.user.UserJwtTokenDto;
 import me.civka.monopoly.dto.user.UserRequestDto;
 import me.civka.monopoly.repository.AuthorityRepository;
@@ -12,6 +13,7 @@ import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.AuthService;
 import me.civka.monopoly.service.exception.AuthorityNotFoundException;
 import me.civka.monopoly.service.exception.UserAlreadyExistsException;
+import me.civka.monopoly.service.mapper.UserMapper;
 import me.civka.monopoly.util.JwtUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
   private final JwtUtils jwtUtils;
   private final PasswordEncoder passwordEncoder;
   private final UserDetailsService userDetailsService;
+  private final UserMapper userMapper;
 
   @Override
   public UserJwtTokenDto register(UserRequestDto userRequestDto) {
@@ -76,5 +79,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     return SecurityContextHolder.getContext().getAuthentication();
+  }
+
+  @Override
+  public UserDto getCurrentUser() {
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return userMapper.toUserDto(user);
   }
 }

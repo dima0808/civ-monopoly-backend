@@ -8,10 +8,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.dto.user.UserDto;
 import me.civka.monopoly.dto.user.UserJwtTokenDto;
 import me.civka.monopoly.dto.user.UserRequestDto;
 import me.civka.monopoly.service.AuthService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,5 +66,20 @@ public class AuthController {
           @RequestBody
           UserRequestDto userRequestDto) {
     return authService.register(userRequestDto);
+  }
+
+  @Operation(
+      summary = "Get current user",
+      description = "Returns the details of the currently authenticated user.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Current user details retrieved"),
+        @ApiResponse(responseCode = "403", description = "User not authenticated")
+      })
+  @GetMapping("/current")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public UserDto getCurrentUser() {
+    return authService.getCurrentUser();
   }
 }
