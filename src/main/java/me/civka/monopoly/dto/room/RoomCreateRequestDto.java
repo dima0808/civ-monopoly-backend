@@ -22,7 +22,6 @@ public class RoomCreateRequestDto {
   @Min(value = 2, message = "Member limit must be at least 2")
   private Integer memberLimit;
 
-  @NotBlank(message = "Password is mandatory")
   @Size(min = 3, max = 20, message = "Password must be between 1 and 20 characters")
   private String password;
 }

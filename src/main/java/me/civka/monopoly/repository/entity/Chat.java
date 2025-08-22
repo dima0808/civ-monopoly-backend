@@ -31,10 +31,10 @@ public class Chat {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID reference;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   private List<User> users; // not null if private chat
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.EAGER)
   private Room room; // not null if public chat
 
   @OneToMany(

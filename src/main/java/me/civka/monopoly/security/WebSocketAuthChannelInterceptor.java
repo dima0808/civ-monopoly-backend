@@ -31,12 +31,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
     if (accessor.getCommand() == StompCommand.SUBSCRIBE) {
 
-      Authentication authentication =
-          authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
-      if (authentication == null) {
-        return null;
-      }
-
       String destination = accessor.getDestination();
       if (destination != null && destination.startsWith(CHAT_DESTINATION_PREFIX)) {
         UUID chatReference;
@@ -50,8 +44,12 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             chatRepository
                 .findById(chatReference)
                 .orElseThrow(() -> new ChatNotFoundException(chatReference));
-        if (!chat.isPublic() && chat.isUserAbsent((User) authentication.getPrincipal())) {
-          return null;
+        if (!chat.isPublic()) {
+          Authentication authentication =
+              authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
+          if (authentication == null || chat.isUserAbsent((User) authentication.getPrincipal())) {
+            return null;
+          }
         }
       }
     }
