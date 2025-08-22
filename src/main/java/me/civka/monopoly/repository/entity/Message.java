@@ -38,6 +38,6 @@ public class Message {
   @ManyToOne(fetch = FetchType.LAZY)
   private Chat chat;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   private User sender;
 }

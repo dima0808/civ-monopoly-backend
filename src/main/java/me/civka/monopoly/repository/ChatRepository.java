@@ -7,11 +7,21 @@ import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
-  @EntityGraph(attributePaths = {"messages", "messages.sender"})
+  @EntityGraph(attributePaths = {"messages"})
+  @NonNull
+  Optional<Chat> findById(@NonNull UUID reference);
+
+  @EntityGraph(attributePaths = {"messages"})
   Optional<Chat> findChatByRoomReference(UUID roomReference);
+
+  @EntityGraph(attributePaths = {"users"})
+  List<Chat> findAllByUsersContaining(User user);
+
+  boolean existsByUsersContainsAndReference(User user, UUID reference);
 
   boolean existsByUsers(List<User> users);
 }

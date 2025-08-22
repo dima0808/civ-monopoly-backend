@@ -9,6 +9,7 @@ import static org.springframework.http.ProblemDetail.forStatusAndDetail;
 
 import java.util.stream.Collectors;
 import me.civka.monopoly.service.exception.AuthorityNotFoundException;
+import me.civka.monopoly.service.exception.ChatAlreadyExistsException;
 import me.civka.monopoly.service.exception.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
 import me.civka.monopoly.service.exception.MemberNotFoundException;
@@ -80,6 +81,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
   public ResponseEntity<ProblemDetail> handleUserAlreadyExistsException(
       UserAlreadyExistsException ex) {
     return getErrorResponseEntity(BAD_REQUEST, "User Already Exists", ex);
+  }
+
+  @ExceptionHandler(ChatAlreadyExistsException.class)
+  public ResponseEntity<ProblemDetail> handleChatAlreadyExistsException(
+      ChatAlreadyExistsException ex) {
+    return getErrorResponseEntity(BAD_REQUEST, "Chat Already Exists", ex);
   }
 
   @ExceptionHandler(UserAlreadyInRoomException.class)

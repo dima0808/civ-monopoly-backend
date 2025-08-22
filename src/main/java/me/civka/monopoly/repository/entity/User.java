@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.civka.monopoly.repository.entity.Authority.AuthorityName;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @NoArgsConstructor
@@ -45,5 +46,9 @@ public class User implements UserDetails {
 
   public boolean equalsById(User user) {
     return user != null && user.getReference().equals(reference);
+  }
+
+  public boolean hasAuthority(AuthorityName authorityName) {
+    return authorities.stream().anyMatch(a -> a.getAuthority().equals(authorityName.name()));
   }
 }

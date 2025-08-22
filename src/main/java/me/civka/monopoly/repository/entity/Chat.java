@@ -43,4 +43,12 @@ public class Chat {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   private List<Message> messages;
+
+  public boolean isPublic() {
+    return users.isEmpty();
+  }
+
+  public boolean isUserAbsent(User user) {
+    return users.stream().noneMatch(u -> u.equalsById(user));
+  }
 }

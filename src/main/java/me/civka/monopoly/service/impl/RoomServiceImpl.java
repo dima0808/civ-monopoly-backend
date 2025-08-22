@@ -91,9 +91,11 @@ public class RoomServiceImpl implements RoomService {
 
     assignUserToRoom(user, room, true);
 
-    convertAndSendTo("/topic/rooms", room, MessageType.CREATE);
+    RoomDto roomDto = roomMapper.toRoomDto(room);
 
-    return roomMapper.toRoomDto(room);
+    convertAndSendTo("/topic/rooms", roomDto, MessageType.CREATE);
+
+    return roomDto;
   }
 
   @Override
@@ -113,15 +115,17 @@ public class RoomServiceImpl implements RoomService {
 
     assignUserToRoom(user, room, false);
 
+    RoomDto roomDto = roomMapper.toRoomDto(room);
+
     convertAndSendTo(
-        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.JOIN);
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), roomDto, MessageType.JOIN);
 
     room.setChat(
         chatRepository
             .findChatByRoomReference(roomReference)
             .orElseThrow(() -> new ChatNotFoundException(roomReference)));
 
-    return roomMapper.toRoomDto(room);
+    return roomDto;
   }
 
   @Override
@@ -135,22 +139,24 @@ public class RoomServiceImpl implements RoomService {
 
     unassignUserFromRoom(user, room);
 
+    RoomDto roomDto = roomMapper.toRoomDto(room);
+
     if (room.getMembers().isEmpty()) {
       roomRepository.deleteById(roomReference);
-      convertAndSendTo("/topic/rooms", room, MessageType.DELETE);
+      convertAndSendTo("/topic/rooms", roomDto, MessageType.DELETE);
       return null;
     }
 
     convertAndSendTo(
-        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.LEAVE);
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), roomDto, MessageType.LEAVE);
 
-    return roomMapper.toRoomDto(room);
+    return roomDto;
   }
 
   @Override
   public RoomDto kickMember(UUID memberReference) {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getRoomReference();
+    UUID roomReference = owner.getMember().getRoom().getReference();
     Room room =
         roomRepository
             .findById(roomReference)
@@ -172,10 +178,12 @@ public class RoomServiceImpl implements RoomService {
 
     unassignUserFromRoom(memberToKick.getUser(), room);
 
-    convertAndSendTo(
-        List.of("/topic/rooms", "/topic/rooms/" + roomReference), room, MessageType.KICK);
+    RoomDto roomDto = roomMapper.toRoomDto(room);
 
-    return roomMapper.toRoomDto(room);
+    convertAndSendTo(
+        List.of("/topic/rooms", "/topic/rooms/" + roomReference), roomDto, MessageType.KICK);
+
+    return roomDto;
   }
 
   @Override
@@ -197,7 +205,7 @@ public class RoomServiceImpl implements RoomService {
     userRepository.saveAll(users);
     roomRepository.deleteById(roomReference);
 
-    convertAndSendTo("/topic/rooms", room, MessageType.DELETE);
+    convertAndSendTo("/topic/rooms", roomMapper.toRoomDto(room), MessageType.DELETE);
   }
 
   private void assignUserToRoom(User user, Room room, boolean isCreator) {
@@ -234,12 +242,12 @@ public class RoomServiceImpl implements RoomService {
         .orElse(Color.BLUE);
   }
 
-  private void convertAndSendTo(String destination, Room room, MessageType type) {
+  private void convertAndSendTo(String destination, RoomDto roomDto, MessageType type) {
     messagingTemplate.convertAndSend(
-        destination, RoomMessage.builder().room(roomMapper.toRoomDto(room)).type(type).build());
+        destination, RoomMessage.builder().room(roomDto).type(type).build());
   }
 
-  private void convertAndSendTo(List<String> destinations, Room room, MessageType type) {
-    destinations.forEach(destination -> convertAndSendTo(destination, room, type));
+  private void convertAndSendTo(List<String> destinations, RoomDto roomDto, MessageType type) {
+    destinations.forEach(destination -> convertAndSendTo(destination, roomDto, type));
   }
 }
