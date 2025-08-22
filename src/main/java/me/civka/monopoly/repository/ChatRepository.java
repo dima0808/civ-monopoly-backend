@@ -11,7 +11,7 @@ import org.springframework.lang.NonNull;
 
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
-  @EntityGraph(attributePaths = {"messages"})
+  @EntityGraph(attributePaths = {"messages.sender", "users"})
   @NonNull
   Optional<Chat> findById(@NonNull UUID reference);
 

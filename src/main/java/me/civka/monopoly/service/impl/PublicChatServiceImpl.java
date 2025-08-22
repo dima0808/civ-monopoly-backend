@@ -3,6 +3,7 @@ package me.civka.monopoly.service.impl;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.dto.chat.ChatDto;
 import me.civka.monopoly.dto.message.MessageDto;
 import me.civka.monopoly.dto.message.MessageRequestDto;
 import me.civka.monopoly.message.ChatMessage;
@@ -22,7 +23,9 @@ import me.civka.monopoly.service.exception.ChatNotFoundException;
 import me.civka.monopoly.service.exception.MessageNotFoundException;
 import me.civka.monopoly.service.exception.UserNotAllowedException;
 import me.civka.monopoly.service.exception.UserNotFoundException;
+import me.civka.monopoly.service.mapper.ChatMapper;
 import me.civka.monopoly.service.mapper.MessageMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,10 +36,28 @@ public class PublicChatServiceImpl implements PublicChatService {
 
   private final UserRepository userRepository;
   private final AuthorityRepository authorityRepository;
+  private final ChatMapper chatMapper;
   private final ChatRepository chatRepository;
   private final MessageMapper messageMapper;
   private final MessageRepository messageRepository;
   private final SimpMessagingTemplate messagingTemplate;
+
+  @Value("${app.chat.public-chat-reference}")
+  private String publicChatReference;
+
+  @Override
+  public ChatDto getPublicChatByReference(UUID chatReference) {
+    Chat chat =
+        chatRepository
+            .findById(chatReference)
+            .orElseThrow(() -> new ChatNotFoundException(chatReference));
+
+    if (!chatReference.equals(UUID.fromString(publicChatReference)) && !chat.isPublic()) {
+      throw new UserNotAllowedException("It is not a public chat");
+    }
+
+    return chatMapper.toChatDto(chat);
+  }
 
   @Override
   public void muteUser(String username) {

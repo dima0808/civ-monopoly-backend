@@ -49,7 +49,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     Chat publicChat = chatRepository.save(Chat.builder().build());
-    publicChat.setReference(UUID.fromString(publicChatReference));
+    //    publicChat.setReference(UUID.fromString(publicChatReference));
     chatRepository.save(publicChat);
   }
 }
