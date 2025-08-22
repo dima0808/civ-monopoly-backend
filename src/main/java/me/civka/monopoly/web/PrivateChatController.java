@@ -14,6 +14,7 @@ import me.civka.monopoly.dto.message.MessageRequestDto;
 import me.civka.monopoly.service.PrivateChatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +43,7 @@ public class PrivateChatController {
       })
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
   public ChatListDto getAllPrivateChats() {
     return chatService.getAllPrivateChats();
   }
@@ -62,6 +64,7 @@ public class PrivateChatController {
       })
   @GetMapping("/{chatReference}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
   public ChatDto getPrivateChatByReference(@PathVariable UUID chatReference) {
     return chatService.getPrivateChatByReference(chatReference);
   }
@@ -86,6 +89,7 @@ public class PrivateChatController {
       })
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasRole('USER')")
   public ChatDto createPrivateChat(String receiverUsername) {
     return chatService.createPrivateChat(receiverUsername);
   }
@@ -110,6 +114,7 @@ public class PrivateChatController {
       })
   @PostMapping("/{chatReference}")
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasRole('USER')")
   public MessageDto sendMessage(
       @PathVariable UUID chatReference, @RequestBody MessageRequestDto messageRequestDto) {
     return chatService.sendMessage(chatReference, messageRequestDto);
@@ -128,6 +133,7 @@ public class PrivateChatController {
       })
   @DeleteMapping("/{chatReference}/{messageReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasRole('USER')")
   public void deleteMessage(@PathVariable UUID chatReference, @PathVariable UUID messageReference) {
     chatService.deleteMessage(chatReference, messageReference);
   }

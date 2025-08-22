@@ -13,6 +13,7 @@ import me.civka.monopoly.dto.message.MessageRequestDto;
 import me.civka.monopoly.service.PublicChatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class PublicChatController {
 
   @Operation(
       summary = "Get public chat by reference",
-      description = "Retrieves the public chat details by its unique reference.")
+      description = "Retrieves the public chat details chat by its reference.")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -50,7 +51,7 @@ public class PublicChatController {
       })
   @GetMapping("/{chatReference}")
   @ResponseStatus(HttpStatus.OK)
-  public ChatDto getChatByReferenceByReference(@PathVariable UUID chatReference) {
+  public ChatDto getChatByReference(@PathVariable UUID chatReference) {
     return chatService.getPublicChatByReference(chatReference);
   }
 
@@ -71,6 +72,7 @@ public class PublicChatController {
       })
   @PutMapping("/mute/{username}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ADMIN')")
   public void muteUser(@PathVariable String username) {
     chatService.muteUser(username);
   }
@@ -92,6 +94,7 @@ public class PublicChatController {
       })
   @PutMapping("/unmute/{username}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ADMIN')")
   public void unmuteUser(@PathVariable String username) {
     chatService.unmuteUser(username);
   }
@@ -116,6 +119,7 @@ public class PublicChatController {
       })
   @PostMapping("/{chatReference}")
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasRole('USER')")
   public MessageDto sendMessage(
       @PathVariable UUID chatReference, @RequestBody MessageRequestDto messageRequestDto) {
     return chatService.sendMessage(chatReference, messageRequestDto);
@@ -134,6 +138,7 @@ public class PublicChatController {
       })
   @DeleteMapping("/{chatReference}/{messageReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasRole('USER')")
   public void deleteMessage(@PathVariable UUID chatReference, @PathVariable UUID messageReference) {
     chatService.deleteMessage(chatReference, messageReference);
   }
