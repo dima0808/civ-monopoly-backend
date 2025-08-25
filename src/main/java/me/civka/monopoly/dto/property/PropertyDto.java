@@ -1,4 +1,4 @@
-package me.civka.monopoly.dto.room;
+package me.civka.monopoly.dto.property;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,21 +8,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.civka.monopoly.dto.member.MemberDto;
-import me.civka.monopoly.dto.room.ext.RoomExtraData;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class RoomDto {
+public class PropertyDto {
 
   private UUID reference;
-  private String name;
-  private Integer memberLimit;
-  private Boolean isStarted;
-  private Integer turnIndex;
-  private List<MemberDto> members;
-
-  private RoomExtraData ext;
+  private Integer position;
+  private Integer mortgage;
+  private List<String> upgrades;
+  private MemberDto member;
 }

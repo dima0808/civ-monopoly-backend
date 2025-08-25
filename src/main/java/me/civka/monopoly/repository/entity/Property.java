@@ -1,6 +1,7 @@
 package me.civka.monopoly.repository.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,8 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,68 +25,58 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "members")
-public class Member {
+@Table(name = "properties")
+public class Property {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID reference;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Civilization civilization;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Color color;
-
   @Column(nullable = false)
   private Integer position;
 
   @Column(nullable = false)
-  private Integer roundsMade;
+  private Integer mortgage;
 
   @Column(nullable = false)
-  private Integer gold;
+  private Integer roundOfLastChange;
 
   @Column(nullable = false)
-  private Integer strength;
+  private Integer turnOfLastChange;
 
-  @Column(nullable = false)
-  private Integer tourism;
+  @ElementCollection(targetClass = UpgradeType.class, fetch = FetchType.EAGER)
+  @Enumerated(EnumType.STRING)
+  private List<UpgradeType> upgrades;
 
-  @Column(nullable = false)
-  private Integer score;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  private User user;
+  @ManyToOne(fetch = FetchType.EAGER)
+  private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Room room;
 
-  public enum Civilization {
-    RANDOM,
-    COLOMBIA,
-    EGYPT,
-    GERMANY,
-    JAPAN,
-    KOREA,
-    ROME,
-    SWEDEN,
+  public enum UpgradeType {
+    LEVEL_1,
+    LEVEL_2,
+    LEVEL_3,
   }
 
-  public enum Color {
-    RED,
-    BLUE,
-    GREEN,
-    YELLOW,
-    TURQUOISE,
-    ORANGE,
-    PINK,
-    VIOLET,
-  }
-
-  public boolean equalsById(Member member) {
-    return member != null && member.getReference().equals(reference);
+  public enum BonusType {
+    TEMPLE_OF_ARTEMIS,
+    CASA_DE_CONTRATACION,
+    COLOSSEUM,
+    ETEMENANKI,
+    MAUSOLEUM_AT_HALICARNASSUS,
+    RUHR_VALLEY,
+    ESTADIO_DO_MARACANA,
+    GOVERNMENT_PLAZA,
+    IRON,
+    FABRIC,
+    SHIPYARD,
+    REEF,
+    WONDER,
+    ENTERTAINMENT_COMPLEX,
+    FARMS,
+    AQUEDUCT,
+    DAM,
   }
 }

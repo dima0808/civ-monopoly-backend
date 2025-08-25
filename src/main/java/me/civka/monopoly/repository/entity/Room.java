@@ -2,6 +2,7 @@ package me.civka.monopoly.repository.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -39,20 +40,35 @@ public class Room {
 
   private String password;
 
+  @Embedded private RoomState state;
+
   @Column(nullable = false)
-  private boolean isStarted;
+  private Boolean isStarted = false;
+
+  @Column(nullable = false)
+  private Integer turnIndex = -1;
+
+  @Column(nullable = false)
+  private Boolean isDiceRolled = false;
+
+  @Column(nullable = false)
+  private Integer turn = 0;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private Chat chat;
 
   @OneToMany(
       mappedBy = "room",
-      fetch = FetchType.LAZY,
+      fetch = FetchType.EAGER,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE},
       orphanRemoval = true)
   private List<Member> members;
 
   public boolean equalsById(Room room) {
     return room != null && room.getReference().equals(reference);
+  }
+
+  public boolean isOwnedBy(User user) {
+    return members.getFirst().getUser().equalsById(user);
   }
 }

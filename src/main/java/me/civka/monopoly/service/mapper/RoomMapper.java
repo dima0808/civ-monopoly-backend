@@ -12,9 +12,12 @@ import org.mapstruct.Mapping;
 public interface RoomMapper {
 
   @Mapping(target = "members", expression = "java(new java.util.ArrayList<>())")
+  @Mapping(target = "isStarted", constant = "false")
+  @Mapping(target = "turn", constant = "-1")
   Room toRoomEntity(RoomCreateRequestDto roomCreateRequestDto);
 
   @Mapping(target = "members", source = "members", qualifiedByName = "toMemberDto")
+  @Mapping(target = "ext", ignore = true)
   RoomDto toRoomDto(Room room);
 
   List<RoomDto> toRoomDto(List<Room> rooms);

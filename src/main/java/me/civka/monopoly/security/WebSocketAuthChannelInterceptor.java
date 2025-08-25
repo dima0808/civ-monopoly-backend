@@ -6,7 +6,7 @@ import me.civka.monopoly.repository.ChatRepository;
 import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.AuthService;
-import me.civka.monopoly.service.exception.ChatNotFoundException;
+import me.civka.monopoly.service.exception.chat.ChatNotFoundException;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;

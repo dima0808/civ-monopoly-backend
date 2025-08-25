@@ -23,15 +23,15 @@ import me.civka.monopoly.repository.entity.Member.Color;
 import me.civka.monopoly.repository.entity.Room;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.RoomService;
-import me.civka.monopoly.service.exception.ChatNotFoundException;
-import me.civka.monopoly.service.exception.IllegalMemberLimitException;
-import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
-import me.civka.monopoly.service.exception.MemberNotFoundException;
-import me.civka.monopoly.service.exception.MemberNotInRoomException;
-import me.civka.monopoly.service.exception.RoomIsFullException;
-import me.civka.monopoly.service.exception.RoomNotFoundException;
-import me.civka.monopoly.service.exception.UserAlreadyInRoomException;
-import me.civka.monopoly.service.exception.UserNotAllowedException;
+import me.civka.monopoly.service.exception.chat.ChatNotFoundException;
+import me.civka.monopoly.service.exception.member.MemberNotFoundException;
+import me.civka.monopoly.service.exception.member.MemberNotInRoomException;
+import me.civka.monopoly.service.exception.room.IllegalMemberLimitException;
+import me.civka.monopoly.service.exception.room.InvalidRoomPasswordException;
+import me.civka.monopoly.service.exception.room.RoomIsFullException;
+import me.civka.monopoly.service.exception.room.RoomNotFoundException;
+import me.civka.monopoly.service.exception.user.UserAlreadyInRoomException;
+import me.civka.monopoly.service.exception.user.UserNotAllowedException;
 import me.civka.monopoly.service.mapper.RoomMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -131,24 +131,23 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto leaveRoom() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = user.getMember().getRoom().getReference();
     Room room =
         roomRepository
-            .findById(roomReference)
-            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+            .getRoomByMembersContaining(user.getMember())
+            .orElseThrow(() -> new RoomNotFoundException(user.getMember()));
 
     unassignUserFromRoom(user, room);
 
     RoomDto roomDto = roomMapper.toRoomDto(room);
 
     if (room.getMembers().isEmpty()) {
-      roomRepository.deleteById(roomReference);
+      roomRepository.deleteById(room.getReference());
       convertAndSendTo("/topic/rooms", roomDto, MessageType.DELETE);
       return null;
     }
 
     convertAndSendTo(
-        List.of("/topic/rooms", "/topic/rooms/" + roomReference), roomDto, MessageType.LEAVE);
+        List.of("/topic/rooms", "/topic/rooms/" + room.getReference()), roomDto, MessageType.LEAVE);
 
     return roomDto;
   }
@@ -156,17 +155,16 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto kickMember(UUID memberReference) {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getReference();
     Room room =
         roomRepository
-            .findById(roomReference)
-            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+            .getRoomByMembersContaining(owner.getMember())
+            .orElseThrow(() -> new RoomNotFoundException(owner.getMember()));
     Member memberToKick =
         memberRepository
             .findById(memberReference)
             .orElseThrow(() -> new MemberNotFoundException(memberReference));
 
-    if (!room.getMembers().getFirst().getUser().equalsById(owner)) {
+    if (!room.isOwnedBy(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
     if (memberToKick.getUser().equalsById(owner)) {
@@ -181,7 +179,7 @@ public class RoomServiceImpl implements RoomService {
     RoomDto roomDto = roomMapper.toRoomDto(room);
 
     convertAndSendTo(
-        List.of("/topic/rooms", "/topic/rooms/" + roomReference), roomDto, MessageType.KICK);
+        List.of("/topic/rooms", "/topic/rooms/" + room.getReference()), roomDto, MessageType.KICK);
 
     return roomDto;
   }
@@ -189,13 +187,12 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public void deleteRoom() {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UUID roomReference = owner.getMember().getRoom().getReference();
     Room room =
         roomRepository
-            .findById(roomReference)
-            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+            .getRoomByMembersContaining(owner.getMember())
+            .orElseThrow(() -> new RoomNotFoundException(owner.getMember()));
 
-    if (!room.getMembers().getFirst().getUser().equalsById(owner)) {
+    if (!room.isOwnedBy(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
 
@@ -203,7 +200,7 @@ public class RoomServiceImpl implements RoomService {
         room.getMembers().stream().map(Member::getUser).peek(user -> user.setMember(null)).toList();
 
     userRepository.saveAll(users);
-    roomRepository.deleteById(roomReference);
+    roomRepository.deleteById(room.getReference());
 
     convertAndSendTo("/topic/rooms", roomMapper.toRoomDto(room), MessageType.DELETE);
   }
@@ -213,6 +210,7 @@ public class RoomServiceImpl implements RoomService {
         Member.builder()
             .color(isCreator ? Color.RED : assignColor(room.getMembers()))
             .civilization(Civilization.RANDOM)
+            .position(0)
             .gold(GOLD_START_VALUE)
             .strength(STRENGTH_START_VALUE)
             .tourism(TOURISM_START_VALUE)

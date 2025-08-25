@@ -4,19 +4,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import me.civka.monopoly.repository.entity.Member;
+import me.civka.monopoly.repository.entity.Property;
 import me.civka.monopoly.repository.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, UUID> {
+public interface PropertyRepository extends JpaRepository<Property, UUID> {
 
-  @NonNull
-  Optional<Room> findById(@NonNull UUID roomReference);
+  List<Property> getPropertiesByRoom(Room room);
 
-  @NonNull
-  List<Room> findAll();
-
-  Optional<Room> getRoomByMembersContaining(Member member);
+  Optional<Property> getPropertyByPositionAndMember(int position, Member member);
 }

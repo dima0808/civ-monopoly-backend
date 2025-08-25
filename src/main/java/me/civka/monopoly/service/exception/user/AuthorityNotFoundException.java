@@ -1,4 +1,4 @@
-package me.civka.monopoly.service.exception;
+package me.civka.monopoly.service.exception.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import me.civka.monopoly.repository.entity.Authority.AuthorityName;

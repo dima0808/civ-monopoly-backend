@@ -113,7 +113,7 @@ public class RoomController {
   public RoomDto joinRoom(
       @Parameter(description = "Room reference UUID", required = true) @PathVariable
           UUID roomReference,
-      @Parameter(description = "Room join request", required = true) @RequestBody @Valid
+      @Parameter(description = "Room join request", required = true) @RequestBody
           RoomJoinRequestDto roomJoinRequestDto) {
     return roomService.joinRoom(roomReference, roomJoinRequestDto.getPassword());
   }

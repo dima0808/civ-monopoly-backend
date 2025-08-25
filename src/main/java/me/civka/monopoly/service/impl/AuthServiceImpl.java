@@ -11,8 +11,8 @@ import me.civka.monopoly.repository.entity.Authority;
 import me.civka.monopoly.repository.entity.Authority.AuthorityName;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.AuthService;
-import me.civka.monopoly.service.exception.AuthorityNotFoundException;
-import me.civka.monopoly.service.exception.UserAlreadyExistsException;
+import me.civka.monopoly.service.exception.user.AuthorityNotFoundException;
+import me.civka.monopoly.service.exception.user.UserAlreadyExistsException;
 import me.civka.monopoly.service.mapper.UserMapper;
 import me.civka.monopoly.util.JwtUtils;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -73,6 +73,9 @@ public class AuthServiceImpl implements AuthService {
     if (token != null && jwtUtils.validateToken(token)) {
       String username = jwtUtils.extractClaims(token).getSubject();
       UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      if (userDetails == null) {
+        return null;
+      }
       UsernamePasswordAuthenticationToken authentication =
           new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);

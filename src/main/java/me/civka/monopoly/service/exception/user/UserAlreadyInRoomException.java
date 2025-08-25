@@ -1,4 +1,4 @@
-package me.civka.monopoly.service.exception;
+package me.civka.monopoly.service.exception.user;
 
 import java.util.UUID;
 

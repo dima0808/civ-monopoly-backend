@@ -1,4 +1,4 @@
-package me.civka.monopoly.service.exception;
+package me.civka.monopoly.service.exception.user;
 
 public class UserNotAllowedException extends RuntimeException {
 

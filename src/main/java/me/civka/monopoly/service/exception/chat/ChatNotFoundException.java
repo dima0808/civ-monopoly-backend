@@ -1,4 +1,4 @@
-package me.civka.monopoly.service.exception;
+package me.civka.monopoly.service.exception.chat;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;

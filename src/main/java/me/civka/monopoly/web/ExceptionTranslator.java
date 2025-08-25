@@ -8,17 +8,19 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ProblemDetail.forStatusAndDetail;
 
 import java.util.stream.Collectors;
-import me.civka.monopoly.service.exception.AuthorityNotFoundException;
-import me.civka.monopoly.service.exception.ChatAlreadyExistsException;
-import me.civka.monopoly.service.exception.IllegalMemberLimitException;
-import me.civka.monopoly.service.exception.InvalidRoomPasswordException;
-import me.civka.monopoly.service.exception.MemberNotFoundException;
-import me.civka.monopoly.service.exception.MemberNotInRoomException;
-import me.civka.monopoly.service.exception.RoomIsFullException;
-import me.civka.monopoly.service.exception.RoomNotFoundException;
-import me.civka.monopoly.service.exception.UserAlreadyExistsException;
-import me.civka.monopoly.service.exception.UserAlreadyInRoomException;
-import me.civka.monopoly.service.exception.UserNotAllowedException;
+import me.civka.monopoly.service.exception.chat.ChatAlreadyExistsException;
+import me.civka.monopoly.service.exception.member.MemberNotFoundException;
+import me.civka.monopoly.service.exception.member.MemberNotInRoomException;
+import me.civka.monopoly.service.exception.property.RequirementNotFulfilledException;
+import me.civka.monopoly.service.exception.room.IllegalMemberLimitException;
+import me.civka.monopoly.service.exception.room.InvalidRoomPasswordException;
+import me.civka.monopoly.service.exception.room.RoomIsFullException;
+import me.civka.monopoly.service.exception.room.RoomNotFoundException;
+import me.civka.monopoly.service.exception.user.AuthorityNotFoundException;
+import me.civka.monopoly.service.exception.user.UserAlreadyExistsException;
+import me.civka.monopoly.service.exception.user.UserAlreadyInRoomException;
+import me.civka.monopoly.service.exception.user.UserNotAllowedException;
+import me.civka.monopoly.service.exception.user.UserNotInRoomException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -60,6 +62,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     return getErrorResponseEntity(NOT_FOUND, "Member Not In Room", ex);
   }
 
+  @ExceptionHandler(UserNotInRoomException.class)
+  public ResponseEntity<ProblemDetail> handleUserNotInRoomException(UserNotInRoomException ex) {
+    return getErrorResponseEntity(NOT_FOUND, "User Not In Room", ex);
+  }
+
   @ExceptionHandler(UsernameNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleUsernameNotFoundException(
       UsernameNotFoundException ex) {
@@ -98,6 +105,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ProblemDetail> handleBadCredentialsException(BadCredentialsException ex) {
     return getErrorResponseEntity(BAD_REQUEST, "Bad Credentials", ex);
+  }
+
+  @ExceptionHandler(RequirementNotFulfilledException.class)
+  public ResponseEntity<ProblemDetail> handleRequirementNotFulfilledException(
+      RequirementNotFulfilledException ex) {
+    return getErrorResponseEntity(BAD_REQUEST, "Requirement Not Fulfilled", ex);
   }
 
   @ExceptionHandler(AuthorizationDeniedException.class)

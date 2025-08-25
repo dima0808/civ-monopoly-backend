@@ -8,7 +8,9 @@ import me.civka.monopoly.repository.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
   @EntityGraph(attributePaths = {"messages.sender", "users"})
