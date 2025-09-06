@@ -1,12 +1,12 @@
 package me.civka.monopoly.service;
 
+import me.civka.monopoly.dto.member.ChangeCivilizationRequestDto;
+import me.civka.monopoly.dto.member.ChangeColorRequestDto;
 import me.civka.monopoly.dto.member.MemberDto;
-import me.civka.monopoly.repository.entity.Member.Civilization;
-import me.civka.monopoly.repository.entity.Member.Color;
 
-public interface MemberService { // TODO
+public interface MemberService {
 
-  MemberDto changeCivilization(Civilization civilization);
+  MemberDto changeCivilization(ChangeCivilizationRequestDto requestDto);
 
-  MemberDto changeColor(Color color);
+  MemberDto changeColor(ChangeColorRequestDto requestDto);
 }

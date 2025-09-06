@@ -4,8 +4,11 @@ import static me.civka.monopoly.util.GameUtils.BOARD_SIZE;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.room.RoomDto;
 import me.civka.monopoly.dto.room.ext.DiceResult;
@@ -14,6 +17,7 @@ import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
 import me.civka.monopoly.repository.entity.Member;
+import me.civka.monopoly.repository.entity.Member.Civilization;
 import me.civka.monopoly.repository.entity.Property;
 import me.civka.monopoly.repository.entity.Room;
 import me.civka.monopoly.service.GameService;
@@ -47,6 +51,8 @@ public class GameServiceImpl implements GameService {
     }
 
     room.setIsStarted(true);
+    assignRandomCivilizations(room);
+
     delegateNextTurn(room);
 
     return roomMapper.toRoomDto(roomRepository.save(room));
@@ -127,5 +133,25 @@ public class GameServiceImpl implements GameService {
             .filter(property -> property.getMortgage() == 0)
             .map(Property::getReference)
             .toList());
+  }
+
+  private void assignRandomCivilizations(Room room) {
+    List<Civilization> takenCivilizations =
+        room.getMembers().stream()
+            .map(Member::getCivilization)
+            .filter(c -> c != Civilization.RANDOM)
+            .toList();
+    List<Civilization> availableCivilizations =
+        Arrays.stream(Civilization.values())
+            .filter(civ -> !takenCivilizations.contains(civ))
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    for (Member member : room.getMembers()) {
+      if (member.getCivilization() == Civilization.RANDOM) {
+        int randomIndex = random.nextInt(availableCivilizations.size());
+        member.setCivilization(availableCivilizations.get(randomIndex));
+        availableCivilizations.remove(randomIndex);
+      }
+    }
   }
 }
