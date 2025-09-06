@@ -1,7 +1,10 @@
 package me.civka.monopoly.config;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.security.HttpAuthTokenFilter;
 import org.springframework.context.annotation.Bean;
@@ -79,6 +82,14 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  @Bean
+  public Validator validator() {
+    Locale.setDefault(Locale.ENGLISH);
+    try (var factory = Validation.buildDefaultValidatorFactory()) {
+      return factory.getValidator();
+    }
   }
 
   @Bean

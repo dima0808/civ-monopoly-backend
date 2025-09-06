@@ -1,0 +1,11 @@
+{
+  "eras": {
+    "CLASSICAL": 10,
+    "MEDIEVAL": 25,
+    "RENAISSANCE": 40,
+    "INDUSTRIAL": 55,
+    "MODERN": 70,
+    "ATOMIC": 85,
+    "INFORMATION": 100
+  }
+}

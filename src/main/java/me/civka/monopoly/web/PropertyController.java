@@ -28,7 +28,7 @@ public class PropertyController {
   @Operation(summary = "Buy property")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Property bought successfully"),
+        @ApiResponse(responseCode = "200", description = "PropertyDetails bought successfully"),
         @ApiResponse(
             responseCode = "403",
             description = "Unable to buy the property (for any reason)")
@@ -37,7 +37,7 @@ public class PropertyController {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
   public PropertyDto buyProperty(
-      @Parameter(description = "Property buy request", required = true) @RequestBody @Valid
+      @Parameter(description = "PropertyDetails buy request", required = true) @RequestBody @Valid
           PropertyRequestDto buyRequest) {
     return propertyService.buyProperty(buyRequest);
   }
@@ -45,7 +45,7 @@ public class PropertyController {
   @Operation(summary = "Upgrade property")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Property upgraded successfully"),
+        @ApiResponse(responseCode = "200", description = "PropertyDetails upgraded successfully"),
         @ApiResponse(
             responseCode = "403",
             description = "Unable to upgrade the property (for any reason)")
@@ -54,7 +54,7 @@ public class PropertyController {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
   public PropertyDto upgradeProperty(
-      @Parameter(description = "Property position", required = true) @RequestBody @Valid
+      @Parameter(description = "PropertyDetails position", required = true) @RequestBody @Valid
           UpgradePropertyRequestDto upgradeRequest) {
     return propertyService.upgradeProperty(upgradeRequest);
   }
@@ -62,7 +62,7 @@ public class PropertyController {
   @Operation(summary = "Mortgage property")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Property mortgaged successfully"),
+        @ApiResponse(responseCode = "200", description = "PropertyDetails mortgaged successfully"),
         @ApiResponse(
             responseCode = "403",
             description = "Unable to mortgage the property (for any reason)")
@@ -71,7 +71,9 @@ public class PropertyController {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
   public PropertyDto mortgageProperty(
-      @Parameter(description = "Property mortgage request", required = true) @RequestBody @Valid
+      @Parameter(description = "PropertyDetails mortgage request", required = true)
+          @RequestBody
+          @Valid
           PropertyRequestDto mortgageRequest) {
     return propertyService.mortgageProperty(mortgageRequest);
   }
@@ -79,7 +81,9 @@ public class PropertyController {
   @Operation(summary = "Demote property upgrade")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Property upgrade demoted successfully"),
+        @ApiResponse(
+            responseCode = "200",
+            description = "PropertyDetails upgrade demoted successfully"),
         @ApiResponse(
             responseCode = "403",
             description = "Unable to demote the property upgrade (for any reason)")
@@ -88,7 +92,9 @@ public class PropertyController {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
   public PropertyDto demoteUpgrade(
-      @Parameter(description = "Property demote request", required = true) @RequestBody @Valid
+      @Parameter(description = "PropertyDetails demote request", required = true)
+          @RequestBody
+          @Valid
           PropertyRequestDto demoteRequest) {
     return propertyService.demoteUpgrade(demoteRequest);
   }
@@ -96,7 +102,7 @@ public class PropertyController {
   @Operation(summary = "Buyback mortgaged property")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Property buyback successful"),
+        @ApiResponse(responseCode = "200", description = "PropertyDetails buyback successful"),
         @ApiResponse(
             responseCode = "403",
             description = "Unable to buyback the property (for any reason)")
@@ -105,7 +111,9 @@ public class PropertyController {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
   public PropertyDto buybackProperty(
-      @Parameter(description = "Property buyback request", required = true) @RequestBody @Valid
+      @Parameter(description = "PropertyDetails buyback request", required = true)
+          @RequestBody
+          @Valid
           PropertyRequestDto buybackRequest) {
     return propertyService.buybackProperty(buybackRequest);
   }

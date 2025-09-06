@@ -48,6 +48,10 @@ public class Property {
   @Enumerated(EnumType.STRING)
   private List<UpgradeType> upgrades;
 
+  @ElementCollection(targetClass = BonusType.class, fetch = FetchType.EAGER)
+  @Enumerated(EnumType.STRING)
+  private List<BonusType> bonuses;
+
   @ManyToOne(fetch = FetchType.EAGER)
   private Member member;
 
@@ -58,6 +62,7 @@ public class Property {
     LEVEL_1,
     LEVEL_2,
     LEVEL_3,
+    LEVEL_4,
   }
 
   public enum BonusType {

@@ -1,4 +1,4 @@
-package me.civka.monopoly.config.game;
+package me.civka.monopoly.config.properties;
 
 import java.util.List;
 import me.civka.monopoly.common.Requirement;

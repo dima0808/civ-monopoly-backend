@@ -2,6 +2,7 @@
   "properties": {
     "1": {
       "name": "Horses",
+      "type": "RESOURCE",
       "upgrades": {
         "LEVEL_1": {
           "name": "Horses",
@@ -35,16 +36,17 @@
     },
     "2": {
       "name": "Bananas",
+      "type": "RESOURCE",
       "upgrades": {
         "LEVEL_1": {
-          "name": "Banana Plantation",
+          "name": "Bananas",
           "price": 300,
           "gos": 45,
           "gpt": 4,
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Banana Market",
+          "name": "Plantation",
           "price": 500,
           "gos": 60,
           "gpt": 7,
@@ -68,16 +70,17 @@
     },
     "3": {
       "name": "Deer",
+      "type": "RESOURCE",
       "upgrades": {
         "LEVEL_1": {
-          "name": "Hunting Camp",
+          "name": "Deer",
           "price": 350,
           "gos": 50,
           "gpt": 4,
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Deer Market",
+          "name": "Camp",
           "price": 500,
           "gos": 75,
           "gpt": 6,
@@ -101,6 +104,7 @@
     },
     "4": {
       "name": "Temple of Artemis",
+      "type": "WONDER",
       "upgrades": {
         "LEVEL_1": {
           "name": "Temple of Artemis",
@@ -108,7 +112,7 @@
           "gos": 30,
           "tourism": 50,
           "gpt": 0,
-          "requirements": ["OWN_DEER_OR_FURS", "OWN_CAMP"]
+          "requirements": ["OWN_CAMP"]
         }
       },
       "bonuses": {
@@ -123,16 +127,17 @@
     },
     "5": {
       "name": "Furs",
+      "type": "RESOURCE",
       "upgrades": {
         "LEVEL_1": {
-          "name": "Fur Camp",
+          "name": "Furs",
           "price": 450,
           "gos": 55,
           "gpt": 4,
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Fur Market",
+          "name": "Camp",
           "price": 500,
           "gos": 75,
           "gpt": 6,
@@ -156,6 +161,7 @@
     },
     "7": {
       "name": "Encampment",
+      "type": "DISTRICT",
       "upgrades": {
         "LEVEL_1": {
           "name": "Encampment",
@@ -165,21 +171,21 @@
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Military Camp",
+          "name": "Barracks",
           "price": 800,
           "gos": 15,
           "gpt": 5,
           "requirements": ["HAVE_LOW_STRENGTH", "MAKE_THREE_TURNS"]
         },
         "LEVEL_3": {
-          "name": "Fort",
+          "name": "Armory",
           "price": 900,
           "gos": 20,
           "gpt": 6,
           "requirements": ["HAVE_MEDIUM_STRENGTH", "MAKE_TWO_TURNS", "ON_MEDIEVAL_ERA"]
         },
         "LEVEL_4": {
-          "name": "Military Base",
+          "name": "Military Academy",
           "price": 1000,
           "gos": 20,
           "gpt": 6,
@@ -197,6 +203,7 @@
     },
     "8": {
       "name": "Alhambra",
+      "type": "WONDER",
       "upgrades": {
         "LEVEL_1": {
           "name": "Alhambra",
@@ -219,13 +226,14 @@
     },
     "9": {
       "name": "Government Plaza",
+      "type": "DISTRICT_SPECIAL",
       "upgrades": {
         "LEVEL_1": {
-          "name": "Government Plaza I",
+          "name": "Government Plaza",
           "price": 600,
           "gos": 40,
           "gpt": 8,
-          "requirements": ["NOT_OWN_GOVERNMENT_PLAZA"]
+          "requirements": ["OWN_NO_GOVERNMENT_PLAZA"]
         },
         "LEVEL_2": {
           "name": "Government Plaza II",
@@ -266,30 +274,31 @@
     },
     "10": {
       "name": "Industrial Zone",
+      "type": "DISTRICT",
       "upgrades": {
         "LEVEL_1": {
-          "name": "Industrial Zone I",
+          "name": "Industrial Zone",
           "price": 1000,
           "gos": 140,
           "gpt": 18,
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Industrial Zone II",
+          "name": "Workshop",
           "price": 1200,
           "gos": 160,
           "gpt": 22,
           "requirements": ["ON_MEDIEVAL_ERA", "MAKE_THREE_TURNS"]
         },
         "LEVEL_3": {
-          "name": "Industrial Zone III",
+          "name": "Factory",
           "price": 1400,
           "gos": 220,
           "gpt": 24,
           "requirements": ["HAVE_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
         },
         "LEVEL_4": {
-          "name": "Industrial Zone IV",
+          "name": "Coal Power Plant",
           "price": 1800,
           "gos": 280,
           "gpt": 26,
@@ -320,6 +329,1444 @@
           "name": "Casa de Contratación",
           "gos": 200,
           "gpt": 2
+        }
+      }
+    },
+    "11": {
+      "name": "Iron",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Iron",
+          "price": 500,
+          "gos": 70,
+          "gpt": 2,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Mine",
+          "price": 500,
+          "gos": 130,
+          "gpt": 4,
+          "requirements": ["MAKE_ONE_ROUND"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_FABRIC": {
+          "type": 1,
+          "name": "Adjacency Fabric",
+          "gos": 100,
+          "gpt": 6
+        },
+        "WONDER_RUHR_VALLEY": {
+          "type": 0,
+          "name": "Ruhr Valley",
+          "gos": 200,
+          "gpt": 7
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 100,
+          "gpt": 1
+        }
+      }
+    },
+    "12": {
+      "name": "Crabs",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Crabs",
+          "price": 550,
+          "gos": 60,
+          "gpt": 8,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Fishing Boat",
+          "price": 600,
+          "gos": 100,
+          "gpt": 12,
+          "requirements": ["MAKE_ONE_ROUND"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_SHIPYARD": {
+          "type": 1,
+          "name": "Adjacency Shipyard",
+          "gos": 140,
+          "gpt": 2
+        },
+        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+          "type": 0,
+          "name": "Mausoleum at Halicarnassus",
+          "gos": 110,
+          "gpt": 2
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 120,
+          "gpt": 6
+        }
+      }
+    },
+    "14": {
+      "name": "Reef",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Reef",
+          "price": 550,
+          "gos": 70,
+          "gpt": 6,
+          "requirements": []
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_SHIPYARD": {
+          "type": 1,
+          "name": "Adjacency Shipyard",
+          "gos": 140,
+          "gpt": 2
+        },
+        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+          "type": 0,
+          "name": "Mausoleum at Halicarnassus",
+          "gos": 110,
+          "gpt": 2
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 120,
+          "gpt": 6
+        }
+      }
+    },
+    "15": {
+      "name": "Campus",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Campus",
+          "price": 800,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Library",
+          "price": 1100,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": ["MAKE_TWO_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "University",
+          "price": 1400,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": ["ON_MEDIEVAL_ERA", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Research Lab",
+          "price": 1700,
+          "gos": 180,
+          "gpt": -24,
+          "requirements": ["ON_MODERN_ERA", "MAKE_FOUR_TURNS", "HAVE_RESEARCH_GRANTS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_REEF": {
+          "type": 1,
+          "name": "Adjacency Reef",
+          "gos": 240,
+          "gpt": 12
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 160,
+          "gpt": 2
+        }
+      }
+    },
+    "16": {
+      "name": "Great Library",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Great Library",
+          "price": 1000,
+          "gos": 140,
+          "tourism": 80,
+          "gpt": 0,
+          "requirements": ["OWN_LIBRARY"]
+        }
+      },
+      "bonuses": {
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 100,
+          "tourism": 18,
+          "gpt": 0
+        }
+      }
+    },
+    "17": {
+      "name": "Harbor",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Harbor",
+          "price": 1000,
+          "gos": 320,
+          "gpt": 16,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Lighthouse",
+          "price": 1050,
+          "gos": 350,
+          "gpt": 18,
+          "requirements": ["HAVE_LOW_GOLD", "MAKE_FOUR_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Shipyard",
+          "price": 1100,
+          "gos": 380,
+          "gpt": 22,
+          "requirements": ["HAVE_MEDIUM_GOLD", "MAKE_TWO_TURNS", "ON_RENAISSANCE_ERA"]
+        },
+        "LEVEL_4": {
+          "name": "Seaport",
+          "price": 1150,
+          "gos": 410,
+          "gpt": 24,
+          "requirements": ["HAVE_HIGH_GOLD", "MAKE_ONE_TURN", "ON_MODERN_ERA"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_GOVERNMENT_PLAZA": {
+          "type": 1,
+          "name": "Adjacency Government Plaza",
+          "gos": 150,
+          "gpt": 8
+        },
+        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+          "type": 0,
+          "name": "Mausoleum at Halicarnassus",
+          "gos": 150,
+          "gpt": 0
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 200,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 200,
+          "gpt": 3
+        }
+      }
+    },
+    "18": {
+      "name": "Government Plaza",
+      "type": "DISTRICT_SPECIAL",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Government Plaza",
+          "price": 600,
+          "gos": 40,
+          "gpt": 8,
+          "requirements": ["NOT_OWN_GOVERNMENT_PLAZA"]
+        },
+        "LEVEL_2": {
+          "name": "Government Plaza II",
+          "price": 800,
+          "gos": 80,
+          "gpt": 10,
+          "requirements": ["ON_CLASSICAL_ERA", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Government Plaza III",
+          "price": 1200,
+          "gos": 120,
+          "gpt": 12,
+          "requirements": ["ON_MEDIEVAL_ERA", "MAKE_TWO_TURNS", "TALL_EMPIRE"]
+        },
+        "LEVEL_4_1": {
+          "name": "Government Plaza IV - Space",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "SUPER_TALL_EMPIRE"]
+        },
+        "LEVEL_4_2": {
+          "name": "Government Plaza IV - Tall",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "SUPER_TALL_EMPIRE"]
+        },
+        "LEVEL_4_3": {
+          "name": "Government Plaza IV - Wonders",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "HAVE_TWO_WONDERS"]
+        }
+      },
+      "bonuses": {
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        }
+      }
+    },
+    "19": {
+      "name": "Commercial Hub",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Commercial Hub",
+          "price": 950,
+          "gos": 200,
+          "gpt": 24,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Market",
+          "price": 1200,
+          "gos": 250,
+          "gpt": 28,
+          "requirements": ["HAVE_LOW_GOLD_PER_TURN", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Bank",
+          "price": 1450,
+          "gos": 300,
+          "gpt": 32,
+          "requirements": ["HAVE_MEDIUM_GOLD_PER_TURN", "ON_RENAISSANCE_ERA", "MAKE_TWO_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Stock Exchange",
+          "price": 1700,
+          "gos": 350,
+          "gpt": 36,
+          "requirements": ["HAVE_HIGH_GOLD_PER_TURN", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_GOVERNMENT_PLAZA": {
+          "type": 1,
+          "name": "Adjacency Government Plaza",
+          "gos": 150,
+          "gpt": 8
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 190,
+          "gpt": 5
+        }
+      }
+    },
+    "20": {
+      "name": "Casa de Contratación",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Casa de Contratación",
+          "price": 1800,
+          "gos": 350,
+          "tourism": 100,
+          "gpt": 0,
+          "requirements": ["OWN_GOVERNMENT_PLAZA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "tourism": 25,
+          "gpt": 0
+        }
+      }
+    },
+    "21": {
+      "name": "Theater Square",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Theater Square",
+          "price": 700,
+          "gos": 100,
+          "gpt": 10,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Amphitheater",
+          "price": 725,
+          "gos": 105,
+          "gpt": 10,
+          "requirements": ["MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Art Museum",
+          "price": 750,
+          "gos": 110,
+          "gpt": 10,
+          "requirements": ["MAKE_THREE_TURNS", "ON_RENAISSANCE_ERA", "HAVE_MEDIUM_TOURISM"]
+        },
+        "LEVEL_4": {
+          "name": "Broadcast Center",
+          "price": 800,
+          "gos": 115,
+          "gpt": 10,
+          "requirements": ["MAKE_TWO_TURNS", "ON_MODERN_ERA", "HAVE_HIGH_TOURISM"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_WONDER": {
+          "type": 1,
+          "name": "Adjacency Wonder",
+          "gos": 120,
+          "gpt": 10
+        },
+        "ADJACENCY_ENTERTAINMENT_COMPLEX": {
+          "type": 1,
+          "name": "Adjacency Entertainment Complex",
+          "gos": 120,
+          "gpt": 10
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 140,
+          "gpt": 2
+        }
+      }
+    },
+    "22": {
+      "name": "Entertainment Complex",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Entertainment Complex",
+          "price": 700,
+          "gos": 90,
+          "gpt": 14,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Arena",
+          "price": 750,
+          "gos": 90,
+          "gpt": 14,
+          "requirements": ["MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Zoo",
+          "price": 800,
+          "gos": 110,
+          "gpt": 16,
+          "requirements": ["WIDE_EMPIRE", "ON_INDUSTRIAL_ERA", "MAKE_TWO_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Stadium",
+          "price": 850,
+          "gos": 110,
+          "gpt": 16,
+          "requirements": ["SUPER_WIDE_EMPIRE", "MAKE_TWO_TURNS", "ON_ATOMIC_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 140,
+          "gpt": 3
+        }
+      }
+    },
+    "23": {
+      "name": "Colosseum",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Colosseum",
+          "price": 1800,
+          "gos": 300,
+          "tourism": 90,
+          "gpt": 0,
+          "requirements": ["OWN_ARENA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 180,
+          "tourism": 18,
+          "gpt": 0
+        }
+      }
+    },
+    "25": {
+      "name": "Maize",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Maize",
+          "price": 500,
+          "gos": 90,
+          "gpt": 2,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Farm",
+          "price": 500,
+          "gos": 100,
+          "gpt": 8,
+          "requirements": ["MAKE_TWO_ROUNDS"]
+        },
+        "LEVEL_3": {
+          "name": "Water Mill",
+          "price": 900,
+          "gos": 120,
+          "gpt": 12,
+          "requirements": ["MAKE_THREE_ROUNDS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_FARMS": {
+          "type": 1,
+          "name": "Adjacency Farms",
+          "gos": 100,
+          "gpt": 6
+        },
+        "WONDER_ETEMENANKI": {
+          "type": 0,
+          "name": "Etemenanki",
+          "gos": 200,
+          "gpt": 6
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 100,
+          "gpt": 1
+        }
+      }
+    },
+    "26": {
+      "name": "Wheat",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Wheat",
+          "price": 525,
+          "gos": 95,
+          "gpt": 3,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Farm",
+          "price": 500,
+          "gos": 100,
+          "gpt": 8,
+          "requirements": ["MAKE_TWO_ROUNDS"]
+        },
+        "LEVEL_3": {
+          "name": "Water Mill",
+          "price": 900,
+          "gos": 120,
+          "gpt": 12,
+          "requirements": ["MAKE_THREE_ROUNDS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_FARMS": {
+          "type": 1,
+          "name": "Adjacency Farms",
+          "gos": 100,
+          "gpt": 6
+        },
+        "WONDER_ETEMENANKI": {
+          "type": 0,
+          "name": "Etemenanki",
+          "gos": 200,
+          "gpt": 6
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 120,
+          "gpt": 1
+        }
+      }
+    },
+    "27": {
+      "name": "Etemenanki",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Etemenanki",
+          "price": 850,
+          "gos": 130,
+          "tourism": 60,
+          "gpt": 0,
+          "requirements": []
+        }
+      },
+      "bonuses": {
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "tourism": 25,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 85,
+          "tourism": 14,
+          "gpt": 0
+        }
+      }
+    },
+    "28": {
+      "name": "Rice",
+      "type": "RESOURCE",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Rice",
+          "price": 550,
+          "gos": 100,
+          "gpt": 5,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Farm",
+          "price": 500,
+          "gos": 100,
+          "gpt": 8,
+          "requirements": ["MAKE_TWO_ROUNDS"]
+        },
+        "LEVEL_3": {
+          "name": "Water Mill",
+          "price": 900,
+          "gos": 120,
+          "gpt": 12,
+          "requirements": ["MAKE_THREE_ROUNDS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_FARMS": {
+          "type": 1,
+          "name": "Adjacency Farms",
+          "gos": 100,
+          "gpt": 6
+        },
+        "WONDER_ETEMENANKI": {
+          "type": 0,
+          "name": "Etemenanki",
+          "gos": 200,
+          "gpt": 6
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 110,
+          "gpt": 1
+        }
+      }
+    },
+    "30": {
+      "name": "Encampment",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Encampment",
+          "price": 700,
+          "gos": 10,
+          "gpt": 5,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Barracks",
+          "price": 800,
+          "gos": 15,
+          "gpt": 5,
+          "requirements": ["HAVE_LOW_STRENGTH", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Armory",
+          "price": 900,
+          "gos": 20,
+          "gpt": 6,
+          "requirements": ["HAVE_MEDIUM_STRENGTH", "MAKE_TWO_TURNS", "ON_MEDIEVAL_ERA"]
+        },
+        "LEVEL_4": {
+          "name": "Military Academy",
+          "price": 1000,
+          "gos": 25,
+          "gpt": 6,
+          "requirements": ["HAVE_HIGH_STRENGTH", "MAKE_TWO_TURNS", "ON_INDUSTRIAL_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 20,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 5,
+          "gpt": 1
+        }
+      }
+    },
+    "31": {
+      "name": "Harbor",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Harbor",
+          "price": 1000,
+          "gos": 320,
+          "gpt": 16,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Lighthouse",
+          "price": 1050,
+          "gos": 350,
+          "gpt": 18,
+          "requirements": ["HAVE_LOW_GOLD", "MAKE_FOUR_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Shipyard",
+          "price": 1100,
+          "gos": 380,
+          "gpt": 22,
+          "requirements": ["HAVE_MEDIUM_GOLD", "MAKE_TWO_TURNS", "ON_RENAISSANCE_ERA"]
+        },
+        "LEVEL_4": {
+          "name": "Seaport",
+          "price": 1150,
+          "gos": 410,
+          "gpt": 24,
+          "requirements": ["HAVE_HIGH_GOLD", "MAKE_ONE_TURN", "ON_MODERN_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+          "type": 0,
+          "name": "Mausoleum at Halicarnassus",
+          "gos": 120,
+          "gpt": 6
+        },
+        "WONDER_COLOSSEUM": {
+          "type": 0,
+          "name": "Colosseum",
+          "gos": 150,
+          "gpt": 5
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 200,
+          "gpt": 3
+        }
+      }
+    },
+    "32": {
+      "name": "Mausoleum at Halicarnassus",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Mausoleum at Halicarnassus",
+          "price": 1100,
+          "gos": 180,
+          "tourism": 70,
+          "gpt": 0,
+          "requirements": ["OWN_HARBOR"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "tourism": 60,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 110,
+          "tourism": 15,
+          "gpt": 0
+        }
+      }
+    },
+    "33": {
+      "name": "Aqueduct",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Aqueduct",
+          "price": 650,
+          "gos": 120,
+          "gpt": 5,
+          "requirements": []
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 130,
+          "gpt": 1
+        }
+      }
+    },
+    "34": {
+      "name": "Industrial Zone",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Industrial Zone",
+          "price": 1000,
+          "gos": 140,
+          "gpt": 18,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Workshop",
+          "price": 1200,
+          "gos": 160,
+          "gpt": 22,
+          "requirements": ["ON_MEDIEVAL_ERA", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Factory",
+          "price": 1400,
+          "gos": 220,
+          "gpt": 24,
+          "requirements": ["HAVE_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
+        },
+        "LEVEL_4": {
+          "name": "Coal Power Plant",
+          "price": 1800,
+          "gos": 280,
+          "gpt": 26,
+          "requirements": ["MAKE_THREE_TURNS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_AQUEDUCT": {
+          "type": 1,
+          "name": "Adjacency Aqueduct",
+          "gos": 400,
+          "gpt": 4
+        },
+        "ADJACENCY_DAM": {
+          "type": 1,
+          "name": "Adjacency Dam",
+          "gos": 400,
+          "gpt": 4
+        },
+        "WONDER_RUHR_VALLEY": {
+          "type": 0,
+          "name": "Ruhr Valley",
+          "gos": 1200,
+          "gpt": 10
+        },
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 200,
+          "gpt": 2
+        }
+      }
+    },
+    "35": {
+      "name": "Dam",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Dam",
+          "price": 1300,
+          "gos": 280,
+          "gpt": 10,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Hydroelectric Dam",
+          "price": 1300,
+          "gos": 140,
+          "gpt": 25,
+          "requirements": ["MAKE_FOUR_TURNS", "ON_MODERN_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 260,
+          "gpt": 2
+        }
+      }
+    },
+    "36": {
+      "name": "Ruhr Valley",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Ruhr Valley",
+          "price": 3000,
+          "gos": 360,
+          "tourism": 120,
+          "gpt": 0,
+          "requirements": ["OWN_FACTORY"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "tourism": 60,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 300,
+          "tourism": 24,
+          "gpt": 0
+        }
+      }
+    },
+    "38": {
+      "name": "Entertainment Complex",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Entertainment Complex",
+          "price": 700,
+          "gos": 90,
+          "gpt": 14,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Arena",
+          "price": 750,
+          "gos": 90,
+          "gpt": 14,
+          "requirements": ["MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Zoo",
+          "price": 800,
+          "gos": 110,
+          "gpt": 16,
+          "requirements": ["WIDE_EMPIRE", "ON_INDUSTRIAL_ERA", "MAKE_TWO_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Stadium",
+          "price": 850,
+          "gos": 110,
+          "gpt": 16,
+          "requirements": ["SUPER_WIDE_EMPIRE", "MAKE_TWO_TURNS", "ON_ATOMIC_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 140,
+          "gpt": 3
+        }
+      }
+    },
+    "39": {
+      "name": "Theater Square",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Theater Square",
+          "price": 700,
+          "gos": 100,
+          "gpt": 10,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Amphitheater",
+          "price": 725,
+          "gos": 105,
+          "gpt": 10,
+          "requirements": ["MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Art Museum",
+          "price": 750,
+          "gos": 110,
+          "gpt": 10,
+          "requirements": ["MAKE_THREE_TURNS", "ON_RENAISSANCE_ERA", "HAVE_MEDIUM_TOURISM"]
+        },
+        "LEVEL_4": {
+          "name": "Broadcast Center",
+          "price": 800,
+          "gos": 115,
+          "gpt": 10,
+          "requirements": ["MAKE_TWO_TURNS", "ON_MODERN_ERA", "HAVE_HIGH_TOURISM"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_WONDER": {
+          "type": 1,
+          "name": "Adjacency Wonder",
+          "gos": 120,
+          "gpt": 10
+        },
+        "ADJACENCY_ENTERTAINMENT_COMPLEX": {
+          "type": 1,
+          "name": "Adjacency Entertainment Complex",
+          "gos": 120,
+          "gpt": 10
+        },
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 140,
+          "gpt": 2
+        }
+      }
+    },
+    "40": {
+      "name": "Estadio Do Maracana",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Estadio Do Maracana",
+          "price": 3200,
+          "gos": 400,
+          "tourism": 170,
+          "gpt": 0,
+          "requirements": ["OWN_STADIUM"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "tourism": 0,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 320,
+          "tourism": 34,
+          "gpt": 0
+        }
+      }
+    },
+    "41": {
+      "name": "Neighborhood",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Neighborhood",
+          "price": 955,
+          "gos": 200,
+          "gpt": 9,
+          "score": 10,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Food Market",
+          "price": 1955,
+          "gos": 450,
+          "gpt": 19,
+          "score": 12,
+          "requirements": ["MAKE_THREE_TURNS", "ON_MODERN_ERA"]
+        },
+        "LEVEL_3": {
+          "name": "Shopping Mall",
+          "price": 2255,
+          "gos": 350,
+          "gpt": 29,
+          "score": 14,
+          "requirements": ["MAKE_FOUR_TURNS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_WONDER": {
+          "type": 1,
+          "name": "Adjacency Wonder",
+          "gos": 300,
+          "gpt": 5
+        },
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 191,
+          "gpt": 2
+        }
+      }
+    },
+    "42": {
+      "name": "Big Ben",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Big Ben",
+          "price": 2800,
+          "gos": 330,
+          "score": 30,
+          "tourism": 145,
+          "gpt": 0,
+          "requirements": ["OWN_STOCK_EXCHANGE"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "tourism": 60,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 280,
+          "tourism": 29,
+          "gpt": 0
+        }
+      }
+    },
+    "43": {
+      "name": "Commercial Hub",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Commercial Hub",
+          "price": 950,
+          "gos": 200,
+          "gpt": 24,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Market",
+          "price": 1200,
+          "gos": 250,
+          "gpt": 28,
+          "requirements": ["HAVE_LOW_GOLD_PER_TURN", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Bank",
+          "price": 1450,
+          "gos": 300,
+          "gpt": 32,
+          "requirements": ["HAVE_MEDIUM_GOLD_PER_TURN", "ON_RENAISSANCE_ERA", "MAKE_TWO_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Stock Exchange",
+          "price": 1700,
+          "gos": 350,
+          "gpt": 36,
+          "requirements": ["HAVE_HIGH_GOLD_PER_TURN", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_GOVERNMENT_PLAZA": {
+          "type": 1,
+          "name": "Adjacency Government Plaza",
+          "gos": 150,
+          "gpt": 8
+        },
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 190,
+          "gpt": 5
+        }
+      }
+    },
+    "44": {
+      "name": "Government Plaza",
+      "type": "DISTRICT_SPECIAL",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Government Plaza",
+          "price": 600,
+          "gos": 40,
+          "gpt": 8,
+          "requirements": ["NOT_OWN_GOVERNMENT_PLAZA"]
+        },
+        "LEVEL_2": {
+          "name": "Government Plaza II",
+          "price": 800,
+          "gos": 80,
+          "gpt": 10,
+          "requirements": ["ON_CLASSICAL_ERA", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "Government Plaza III",
+          "price": 1200,
+          "gos": 120,
+          "gpt": 12,
+          "requirements": ["ON_MEDIEVAL_ERA", "MAKE_TWO_TURNS", "TALL_EMPIRE"]
+        },
+        "LEVEL_4_1": {
+          "name": "Government Plaza IV - Space",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "SUPER_TALL_EMPIRE"]
+        },
+        "LEVEL_4_2": {
+          "name": "Government Plaza IV - Tall",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "SUPER_TALL_EMPIRE"]
+        },
+        "LEVEL_4_3": {
+          "name": "Government Plaza IV - Wonders",
+          "price": 1800,
+          "gos": 200,
+          "gpt": 14,
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "HAVE_TWO_WONDERS"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        }
+      }
+    },
+    "45": {
+      "name": "Campus",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Campus",
+          "price": 800,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": []
+        },
+        "LEVEL_2": {
+          "name": "Library",
+          "price": 1100,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": ["MAKE_TWO_TURNS"]
+        },
+        "LEVEL_3": {
+          "name": "University",
+          "price": 1400,
+          "gos": 180,
+          "gpt": 12,
+          "requirements": ["ON_MEDIEVAL_ERA", "MAKE_THREE_TURNS"]
+        },
+        "LEVEL_4": {
+          "name": "Research Lab",
+          "price": 1700,
+          "gos": 180,
+          "gpt": -24,
+          "requirements": ["ON_MODERN_ERA", "MAKE_FOUR_TURNS", "HAVE_RESEARCH_GRANTS"]
+        }
+      },
+      "bonuses": {
+        "ADJACENCY_GOVERNMENT_PLAZA": {
+          "type": 1,
+          "name": "Adjacency Government Plaza",
+          "gos": 120,
+          "gpt": 6
+        },
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 160,
+          "gpt": 2
+        }
+      }
+    },
+    "46": {
+      "name": "Oxford University",
+      "type": "WONDER",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Oxford University",
+          "price": 1700,
+          "gos": 400,
+          "score": 40,
+          "tourism": 130,
+          "gpt": 0,
+          "requirements": ["OWN_UNIVERSITY"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "tourism": 60,
+          "gpt": 0
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 170,
+          "tourism": 26,
+          "gpt": 0
+        }
+      }
+    },
+    "47": {
+      "name": "Spaceport",
+      "type": "DISTRICT",
+      "upgrades": {
+        "LEVEL_1": {
+          "name": "Spaceport",
+          "price": 1800,
+          "gos": 220,
+          "gpt": 15,
+          "score": 40,
+          "requirements": ["ON_MODERN_ERA"]
+        }
+      },
+      "bonuses": {
+        "WONDER_ESTADIO_DO_MARACANA": {
+          "type": 0,
+          "name": "Estadio Do Maracana",
+          "gos": 180,
+          "gpt": 5,
+          "tourism": 20
+        },
+        "WONDER_CASA_DE_CONTRATACION": {
+          "type": 0,
+          "name": "Casa de Contratación",
+          "gos": 180,
+          "gpt": 3
         }
       }
     }

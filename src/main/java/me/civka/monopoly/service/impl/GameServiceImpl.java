@@ -47,7 +47,7 @@ public class GameServiceImpl implements GameService {
             .orElseThrow(() -> new RoomNotFoundException(member));
 
     if (!room.isOwnedBy(member.getUser())) {
-      throw new UserNotAllowedException("User are not allowed to start the game.");
+      throw new UserNotAllowedException("User are not allowed to start the properties.");
     }
 
     room.setIsStarted(true);

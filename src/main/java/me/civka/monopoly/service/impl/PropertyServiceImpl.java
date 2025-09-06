@@ -6,7 +6,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.Requirement;
-import me.civka.monopoly.config.game.PropertiesConfiguration;
+import me.civka.monopoly.config.ConfigurationHolder;
+import me.civka.monopoly.config.properties.PropertiesConfiguration;
 import me.civka.monopoly.dto.property.PropertyDto;
 import me.civka.monopoly.dto.property.PropertyRequestDto;
 import me.civka.monopoly.dto.property.UpgradePropertyRequestDto;
@@ -39,7 +40,9 @@ public class PropertyServiceImpl implements PropertyService {
   private final RoomRepository roomRepository;
   private final PropertyMapper propertyMapper;
   private final MemberRepository memberRepository;
-  private final PropertiesConfiguration propertiesConfiguration;
+
+  private final PropertiesConfiguration propertiesConfiguration =
+      ConfigurationHolder.propertiesConfiguration();
 
   @Override
   public PropertyDto buyProperty(PropertyRequestDto buyRequest) {
@@ -51,13 +54,14 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     int price = checkForPrice(member, position, UpgradeType.LEVEL_1);
-    checkForBuyRequirements(member, position);
 
     Room room =
         roomRepository
             .getRoomByMembersContaining(member)
             .orElseThrow(() -> new RoomNotFoundException(member));
+    List<Property> ownedProperties = propertyRepository.getPropertiesByMember(member);
 
+    checkForBuyRequirements(member, room, ownedProperties, position);
     checkForCurrentTurn(member, room);
 
     member.setGold(member.getGold() - price);
@@ -69,6 +73,7 @@ public class PropertyServiceImpl implements PropertyService {
             .turnOfLastChange(room.getTurn())
             .roundOfLastChange(member.getRoundsMade())
             .upgrades(List.of(UpgradeType.LEVEL_1))
+            .bonuses(List.of())
             .member(memberRepository.save(member))
             .room(room)
             .build();
@@ -96,7 +101,14 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     int price = checkForPrice(member, position, upgradeType);
-    checkForUpgradeRequirements(member, property, upgradeType);
+
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+    List<Property> ownedProperties = propertyRepository.getPropertiesByMember(member);
+
+    checkForUpgradeRequirements(member, property, room, ownedProperties, upgradeType);
 
     checkForCurrentTurn(member);
 
@@ -117,7 +129,7 @@ public class PropertyServiceImpl implements PropertyService {
             .orElseThrow(() -> new PropertyNotFoundException(position, member));
 
     if (property.getMortgage() != -1) {
-      throw new UserNotAllowedException("Property is already mortgaged.");
+      throw new UserNotAllowedException("PropertyDetails is already mortgaged.");
     }
 
     int price =
@@ -144,7 +156,7 @@ public class PropertyServiceImpl implements PropertyService {
             .orElseThrow(() -> new PropertyNotFoundException(position, member));
 
     if (property.getUpgrades().size() == 1) {
-      throw new UserNotAllowedException("Property has no upgrades to demote.");
+      throw new UserNotAllowedException("PropertyDetails has no upgrades to demote.");
     }
 
     UpgradeType lastUpgrade = property.getUpgrades().getLast();
@@ -168,7 +180,7 @@ public class PropertyServiceImpl implements PropertyService {
             .orElseThrow(() -> new PropertyNotFoundException(position, member));
 
     if (property.getMortgage() == -1) {
-      throw new UserNotAllowedException("Property is not mortgaged.");
+      throw new UserNotAllowedException("PropertyDetails is not mortgaged.");
     }
 
     int price =
@@ -218,7 +230,8 @@ public class PropertyServiceImpl implements PropertyService {
     checkForCurrentTurn(member, room);
   }
 
-  private void checkForBuyRequirements(Member member, int position) {
+  private void checkForBuyRequirements(
+      Member member, Room room, List<Property> ownedProperties, int position) {
     List<Requirement> requirements =
         propertiesConfiguration
             .properties()
@@ -228,7 +241,7 @@ public class PropertyServiceImpl implements PropertyService {
             .requirements();
 
     requirements.stream()
-        .filter(requirement -> !requirement.isBuyAllowed(member))
+        .filter(requirement -> !requirement.isBuyAllowed(member, room, ownedProperties))
         .forEach(
             requirement -> {
               throw new RequirementNotFulfilledException(requirement);
@@ -236,7 +249,11 @@ public class PropertyServiceImpl implements PropertyService {
   }
 
   private void checkForUpgradeRequirements(
-      Member member, Property property, UpgradeType upgradeType) {
+      Member member,
+      Property property,
+      Room room,
+      List<Property> ownedProperties,
+      UpgradeType upgradeType) {
     List<Requirement> requirements =
         propertiesConfiguration
             .properties()
@@ -246,7 +263,8 @@ public class PropertyServiceImpl implements PropertyService {
             .requirements();
 
     requirements.stream()
-        .filter(requirement -> !requirement.isUpgradeAllowed(property, member))
+        .filter(
+            requirement -> !requirement.isUpgradeAllowed(property, member, room, ownedProperties))
         .forEach(
             requirement -> {
               throw new RequirementNotFulfilledException(requirement);

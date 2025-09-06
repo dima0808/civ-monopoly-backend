@@ -20,7 +20,7 @@ public class GameController {
 
   private final GameService gameService;
 
-  @Operation(summary = "Start the game")
+  @Operation(summary = "Start the properties")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Game started successfully"),

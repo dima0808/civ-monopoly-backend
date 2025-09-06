@@ -1,0 +1,76 @@
+{
+  "requirements": {
+    "HAVE_LOW_GOLD": {
+      "_comment": "[0] - minimum gold needed",
+      "params": [
+        500
+      ]
+    },
+    "HAVE_MEDIUM_GOLD": {
+      "_comment": "[0] - minimum gold needed",
+      "params": [
+        1500
+      ]
+    },
+    "HAVE_HIGH_GOLD": {
+      "_comment": "[0] - minimum gold needed",
+      "params": [
+        2000
+      ]
+    },
+    "HAVE_LOW_STRENGTH": {
+      "_comment": "[0] - minimum strength needed",
+      "params": [
+        400
+      ]
+    },
+    "HAVE_MEDIUM_STRENGTH": {
+      "_comment": "[0] - minimum strength needed",
+      "params": [
+        800
+      ]
+    },
+    "HAVE_HIGH_STRENGTH": {
+      "_comment": "[0] - minimum strength needed",
+      "params": [
+        1200
+      ]
+    },
+    "HAVE_MEDIUM_TOURISM": {
+      "_comment": "[0] - minimum tourism needed",
+      "params": [
+        300
+      ]
+    },
+    "HAVE_HIGH_TOURISM": {
+      "_comment": "[0] - minimum tourism needed",
+      "params": [
+        600
+      ]
+    },
+    "TALL_EMPIRE": {
+      "_comment": "[0] - minimum number of property upgrades",
+      "params": [
+        9
+      ]
+    },
+    "SUPER_TALL_EMPIRE": {
+      "_comment": "[0] - minimum number of property upgrades",
+      "params": [
+        15
+      ]
+    },
+    "WIDE_EMPIRE": {
+      "_comment": "[0] - minimum number of properties owned",
+      "params": [
+        7
+      ]
+    },
+    "SUPER_WIDE_EMPIRE": {
+      "_comment": "[0] - minimum number of properties owned",
+      "params": [
+        11
+      ]
+    }
+  }
+}
