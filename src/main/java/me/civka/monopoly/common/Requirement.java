@@ -47,6 +47,14 @@ public enum Requirement implements RequirementService {
     }
   },
 
+  MAKE_ONE_TURN {
+    @Override
+    public boolean isUpgradeAllowed(
+        Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
+      return propertyToUpgrade.getTurnOfLastChange() - room.getTurn() >= 1;
+    }
+  },
+
   MAKE_TWO_TURNS {
     @Override
     public boolean isUpgradeAllowed(

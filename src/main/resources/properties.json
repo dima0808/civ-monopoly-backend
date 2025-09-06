@@ -268,7 +268,7 @@
           "price": 1800,
           "gos": 200,
           "gpt": 14,
-          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "HAVE_TWO_WONDERS"]
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "OWN_TWO_WONDERS"]
         }
       }
     },
@@ -295,7 +295,7 @@
           "price": 1400,
           "gos": 220,
           "gpt": 24,
-          "requirements": ["HAVE_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
+          "requirements": ["OWN_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
         },
         "LEVEL_4": {
           "name": "Coal Power Plant",
@@ -306,13 +306,13 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_IRON": {
+        "IRON": {
           "type": 1,
           "name": "Adjacency Iron",
           "gos": 400,
           "gpt": 4
         },
-        "ADJACENCY_GOVERNMENT_PLAZA": {
+        "GOVERNMENT_PLAZA": {
           "type": 1,
           "name": "Adjacency Government Plaza",
           "gos": 200,
@@ -352,19 +352,19 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_FABRIC": {
+        "FABRIC": {
           "type": 1,
           "name": "Adjacency Fabric",
           "gos": 100,
           "gpt": 6
         },
-        "WONDER_RUHR_VALLEY": {
+        "RUHR_VALLEY": {
           "type": 0,
           "name": "Ruhr Valley",
           "gos": 200,
           "gpt": 7
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 100,
@@ -392,19 +392,19 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_SHIPYARD": {
+        "SHIPYARD": {
           "type": 1,
           "name": "Adjacency Shipyard",
           "gos": 140,
           "gpt": 2
         },
-        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+        "MAUSOLEUM_AT_HALICARNASSUS": {
           "type": 0,
           "name": "Mausoleum at Halicarnassus",
           "gos": 110,
           "gpt": 2
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 120,
@@ -425,19 +425,19 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_SHIPYARD": {
+        "SHIPYARD": {
           "type": 1,
           "name": "Adjacency Shipyard",
           "gos": 140,
           "gpt": 2
         },
-        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+        "MAUSOLEUM_AT_HALICARNASSUS": {
           "type": 0,
           "name": "Mausoleum at Halicarnassus",
           "gos": 110,
           "gpt": 2
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 120,
@@ -479,13 +479,13 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_REEF": {
+        "REEF": {
           "type": 1,
           "name": "Adjacency Reef",
           "gos": 240,
           "gpt": 12
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 160,
@@ -507,7 +507,7 @@
         }
       },
       "bonuses": {
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 100,
@@ -550,25 +550,25 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_GOVERNMENT_PLAZA": {
+        "GOVERNMENT_PLAZA": {
           "type": 1,
           "name": "Adjacency Government Plaza",
           "gos": 150,
           "gpt": 8
         },
-        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+        "MAUSOLEUM_AT_HALICARNASSUS": {
           "type": 0,
           "name": "Mausoleum at Halicarnassus",
           "gos": 150,
           "gpt": 0
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 200,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 200,
@@ -585,7 +585,7 @@
           "price": 600,
           "gos": 40,
           "gpt": 8,
-          "requirements": ["NOT_OWN_GOVERNMENT_PLAZA"]
+          "requirements": ["OWN_NO_GOVERNMENT_PLAZA"]
         },
         "LEVEL_2": {
           "name": "Government Plaza II",
@@ -620,11 +620,11 @@
           "price": 1800,
           "gos": 200,
           "gpt": 14,
-          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "HAVE_TWO_WONDERS"]
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "OWN_TWO_WONDERS"]
         }
       },
       "bonuses": {
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
@@ -666,19 +666,19 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_GOVERNMENT_PLAZA": {
+        "GOVERNMENT_PLAZA": {
           "type": 1,
           "name": "Adjacency Government Plaza",
           "gos": 150,
           "gpt": 8
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 190,
@@ -700,7 +700,7 @@
         }
       },
       "bonuses": {
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
@@ -743,25 +743,25 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_WONDER": {
+        "WONDER": {
           "type": 1,
           "name": "Adjacency Wonder",
           "gos": 120,
           "gpt": 10
         },
-        "ADJACENCY_ENTERTAINMENT_COMPLEX": {
+        "ENTERTAINMENT_COMPLEX": {
           "type": 1,
           "name": "Adjacency Entertainment Complex",
           "gos": 120,
           "gpt": 10
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 140,
@@ -803,13 +803,13 @@
         }
       },
       "bonuses": {
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 140,
@@ -831,7 +831,7 @@
         }
       },
       "bonuses": {
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 180,
@@ -867,25 +867,25 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_FARMS": {
+        "FARMS": {
           "type": 1,
           "name": "Adjacency Farms",
           "gos": 100,
           "gpt": 6
         },
-        "WONDER_ETEMENANKI": {
+        "ETEMENANKI": {
           "type": 0,
           "name": "Etemenanki",
           "gos": 200,
           "gpt": 6
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 100,
@@ -920,25 +920,25 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_FARMS": {
+        "FARMS": {
           "type": 1,
           "name": "Adjacency Farms",
           "gos": 100,
           "gpt": 6
         },
-        "WONDER_ETEMENANKI": {
+        "ETEMENANKI": {
           "type": 0,
           "name": "Etemenanki",
           "gos": 200,
           "gpt": 6
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 120,
@@ -960,14 +960,14 @@
         }
       },
       "bonuses": {
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "tourism": 25,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 85,
@@ -1003,25 +1003,25 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_FARMS": {
+        "FARMS": {
           "type": 1,
           "name": "Adjacency Farms",
           "gos": 100,
           "gpt": 6
         },
-        "WONDER_ETEMENANKI": {
+        "ETEMENANKI": {
           "type": 0,
           "name": "Etemenanki",
           "gos": 200,
           "gpt": 6
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 110,
@@ -1063,13 +1063,13 @@
         }
       },
       "bonuses": {
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 20,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 5,
@@ -1111,19 +1111,19 @@
         }
       },
       "bonuses": {
-        "WONDER_MAUSOLEUM_AT_HALICARNASSUS": {
+        "MAUSOLEUM_AT_HALICARNASSUS": {
           "type": 0,
           "name": "Mausoleum at Halicarnassus",
           "gos": 120,
           "gpt": 6
         },
-        "WONDER_COLOSSEUM": {
+        "COLOSSEUM": {
           "type": 0,
           "name": "Colosseum",
           "gos": 150,
           "gpt": 5
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 200,
@@ -1145,14 +1145,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "tourism": 60,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 110,
@@ -1174,14 +1174,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 130,
@@ -1212,7 +1212,7 @@
           "price": 1400,
           "gos": 220,
           "gpt": 24,
-          "requirements": ["HAVE_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
+          "requirements": ["OWN_TWO_RESOURCES", "MAKE_THREE_TURNS", "ON_INDUSTRIAL_ERA"]
         },
         "LEVEL_4": {
           "name": "Coal Power Plant",
@@ -1223,32 +1223,32 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_AQUEDUCT": {
+        "AQUEDUCT": {
           "type": 1,
           "name": "Adjacency Aqueduct",
           "gos": 400,
           "gpt": 4
         },
-        "ADJACENCY_DAM": {
+        "DAM": {
           "type": 1,
           "name": "Adjacency Dam",
           "gos": 400,
           "gpt": 4
         },
-        "WONDER_RUHR_VALLEY": {
+        "RUHR_VALLEY": {
           "type": 0,
           "name": "Ruhr Valley",
           "gos": 1200,
           "gpt": 10
         },
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 200,
@@ -1276,14 +1276,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 260,
@@ -1305,14 +1305,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "tourism": 60,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 300,
@@ -1355,14 +1355,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 140,
@@ -1404,26 +1404,26 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_WONDER": {
+        "WONDER": {
           "type": 1,
           "name": "Adjacency Wonder",
           "gos": 120,
           "gpt": 10
         },
-        "ADJACENCY_ENTERTAINMENT_COMPLEX": {
+        "ENTERTAINMENT_COMPLEX": {
           "type": 1,
           "name": "Adjacency Entertainment Complex",
           "gos": 120,
           "gpt": 10
         },
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 140,
@@ -1445,14 +1445,14 @@
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "tourism": 0,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 320,
@@ -1470,7 +1470,6 @@
           "price": 955,
           "gos": 200,
           "gpt": 9,
-          "score": 10,
           "requirements": []
         },
         "LEVEL_2": {
@@ -1478,7 +1477,6 @@
           "price": 1955,
           "gos": 450,
           "gpt": 19,
-          "score": 12,
           "requirements": ["MAKE_THREE_TURNS", "ON_MODERN_ERA"]
         },
         "LEVEL_3": {
@@ -1486,25 +1484,24 @@
           "price": 2255,
           "gos": 350,
           "gpt": 29,
-          "score": 14,
           "requirements": ["MAKE_FOUR_TURNS"]
         }
       },
       "bonuses": {
-        "ADJACENCY_WONDER": {
+        "WONDER": {
           "type": 1,
           "name": "Adjacency Wonder",
           "gos": 300,
           "gpt": 5
         },
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 191,
@@ -1520,21 +1517,20 @@
           "name": "Big Ben",
           "price": 2800,
           "gos": 330,
-          "score": 30,
           "tourism": 145,
           "gpt": 0,
           "requirements": ["OWN_STOCK_EXCHANGE"]
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "tourism": 60,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 280,
@@ -1577,20 +1573,20 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_GOVERNMENT_PLAZA": {
+        "GOVERNMENT_PLAZA": {
           "type": 1,
           "name": "Adjacency Government Plaza",
           "gos": 150,
           "gpt": 8
         },
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 190,
@@ -1607,7 +1603,7 @@
           "price": 600,
           "gos": 40,
           "gpt": 8,
-          "requirements": ["NOT_OWN_GOVERNMENT_PLAZA"]
+          "requirements": ["OWN_NO_GOVERNMENT_PLAZA"]
         },
         "LEVEL_2": {
           "name": "Government Plaza II",
@@ -1642,11 +1638,11 @@
           "price": 1800,
           "gos": 200,
           "gpt": 14,
-          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "HAVE_TWO_WONDERS"]
+          "requirements": ["ON_MODERN_ERA", "MAKE_THREE_TURNS", "OWN_TWO_WONDERS"]
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
@@ -1689,20 +1685,20 @@
         }
       },
       "bonuses": {
-        "ADJACENCY_GOVERNMENT_PLAZA": {
+        "GOVERNMENT_PLAZA": {
           "type": 1,
           "name": "Adjacency Government Plaza",
           "gos": 120,
           "gpt": 6
         },
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 160,
@@ -1718,21 +1714,20 @@
           "name": "Oxford University",
           "price": 1700,
           "gos": 400,
-          "score": 40,
           "tourism": 130,
           "gpt": 0,
           "requirements": ["OWN_UNIVERSITY"]
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "tourism": 60,
           "gpt": 0
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 170,
@@ -1750,19 +1745,18 @@
           "price": 1800,
           "gos": 220,
           "gpt": 15,
-          "score": 40,
           "requirements": ["ON_MODERN_ERA"]
         }
       },
       "bonuses": {
-        "WONDER_ESTADIO_DO_MARACANA": {
+        "ESTADIO_DO_MARACANA": {
           "type": 0,
           "name": "Estadio Do Maracana",
           "gos": 180,
           "gpt": 5,
           "tourism": 20
         },
-        "WONDER_CASA_DE_CONTRATACION": {
+        "CASA_DE_CONTRATACION": {
           "type": 0,
           "name": "Casa de Contratación",
           "gos": 180,

@@ -9,6 +9,7 @@ import me.civka.monopoly.config.requirements.RequirementsConfiguration;
 
 public class ConfigurationHolder {
 
+  public static final String GAME_CONFIGURATION_PATH = "src/main/resources/game.json";
   private static final String PROPERTIES_CONFIGURATION_PATH = "src/main/resources/properties.json";
   public static final String REQUIREMENTS_CONFIGURATION_PATH =
       "src/main/resources/requirements.json";
@@ -20,8 +21,7 @@ public class ConfigurationHolder {
   static {
     try {
       gameConfiguration =
-          new ObjectMapper()
-              .readValue(new File("src/main/resources/game.json"), GameConfiguration.class);
+          new ObjectMapper().readValue(new File(GAME_CONFIGURATION_PATH), GameConfiguration.class);
       propertiesConfiguration =
           new ObjectMapper()
               .readValue(new File(PROPERTIES_CONFIGURATION_PATH), PropertiesConfiguration.class);

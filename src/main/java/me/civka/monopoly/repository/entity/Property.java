@@ -63,6 +63,9 @@ public class Property {
     LEVEL_2,
     LEVEL_3,
     LEVEL_4,
+    LEVEL_4_1,
+    LEVEL_4_2,
+    LEVEL_4_3
   }
 
   public enum BonusType {
