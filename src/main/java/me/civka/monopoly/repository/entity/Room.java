@@ -11,10 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +23,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 @Entity
 @Table(name = "rooms")
 public class Room {
@@ -62,7 +61,7 @@ public class Room {
       fetch = FetchType.EAGER,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE},
       orphanRemoval = true)
-  private List<Member> members;
+  private List<Member> members = new ArrayList<>();
 
   public boolean equalsById(Room room) {
     return room != null && room.getReference().equals(reference);

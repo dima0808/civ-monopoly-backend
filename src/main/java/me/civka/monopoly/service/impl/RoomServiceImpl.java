@@ -1,6 +1,5 @@
 package me.civka.monopoly.service.impl;
 
-import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -30,8 +29,8 @@ import me.civka.monopoly.service.exception.room.IllegalMemberLimitException;
 import me.civka.monopoly.service.exception.room.InvalidRoomPasswordException;
 import me.civka.monopoly.service.exception.room.RoomIsFullException;
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
-import me.civka.monopoly.service.exception.user.UserAlreadyInRoomException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
+import me.civka.monopoly.service.exception.user.UserNotInRoomException;
 import me.civka.monopoly.service.mapper.RoomMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,7 +73,6 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  @Transactional
   public RoomDto createRoom(RoomCreateRequestDto roomCreateRequestDto) {
     if (roomCreateRequestDto.getMemberLimit() > MAX_MEMBER_LIMIT) {
       throw new IllegalMemberLimitException(
@@ -82,7 +80,7 @@ public class RoomServiceImpl implements RoomService {
     }
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (user.getMember() != null) {
-      throw new UserAlreadyInRoomException(user.getReference());
+      leaveRoom();
     }
 
     Room room = roomMapper.toRoomEntity(roomCreateRequestDto);
@@ -112,6 +110,16 @@ public class RoomServiceImpl implements RoomService {
     if (room.getPassword() != null && !room.getPassword().equals(password)) {
       throw new InvalidRoomPasswordException(room.getName());
     }
+    if (user.getMember() != null) {
+      Room currentRoom =
+          roomRepository
+              .getRoomByMembersContaining(user.getMember())
+              .orElseThrow(() -> new RoomNotFoundException(user.getMember()));
+      if (currentRoom.equalsById(room)) {
+        throw new UserNotAllowedException("You are already in this room");
+      }
+      leaveRoom();
+    }
 
     assignUserToRoom(user, room, false);
 
@@ -131,6 +139,9 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto leaveRoom() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (user.getMember() == null) {
+      throw new UserNotInRoomException(user.getUsername());
+    }
     Room room =
         roomRepository
             .getRoomByMembersContaining(user.getMember())
@@ -170,7 +181,12 @@ public class RoomServiceImpl implements RoomService {
     if (memberToKick.getUser().equalsById(owner)) {
       throw new UserNotAllowedException("You cannot kick yourself from the room");
     }
-    if (!memberToKick.getRoom().equalsById(room)) {
+
+    Room memberToKickRoom =
+        roomRepository
+            .getRoomByMembersContaining(memberToKick)
+            .orElseThrow(() -> new RoomNotFoundException(memberToKick));
+    if (!memberToKickRoom.equalsById(room)) {
       throw new MemberNotInRoomException(room.getName(), memberReference);
     }
 
@@ -211,6 +227,7 @@ public class RoomServiceImpl implements RoomService {
             .color(isCreator ? Color.RED : assignColor(room.getMembers()))
             .civilization(Civilization.RANDOM)
             .position(0)
+            .roundsMade(0)
             .gold(GOLD_START_VALUE)
             .strength(STRENGTH_START_VALUE)
             .tourism(TOURISM_START_VALUE)
