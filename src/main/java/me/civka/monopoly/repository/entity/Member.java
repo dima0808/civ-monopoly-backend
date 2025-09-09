@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +57,9 @@ public class Member {
 
   @Column(nullable = false)
   private Integer score;
+
+  @Column(nullable = false)
+  private OffsetDateTime joinedAt;
 
   @OneToOne(fetch = FetchType.EAGER)
   private User user;

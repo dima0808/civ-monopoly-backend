@@ -9,6 +9,7 @@ import static org.springframework.http.ProblemDetail.forStatusAndDetail;
 
 import java.util.stream.Collectors;
 import me.civka.monopoly.service.exception.chat.ChatAlreadyExistsException;
+import me.civka.monopoly.service.exception.chat.ChatNotFoundException;
 import me.civka.monopoly.service.exception.member.MemberNotFoundException;
 import me.civka.monopoly.service.exception.member.MemberNotInRoomException;
 import me.civka.monopoly.service.exception.property.RequirementNotFulfilledException;
@@ -50,6 +51,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
   @ExceptionHandler(RoomNotFoundException.class)
   public ResponseEntity<ProblemDetail> handleRoomNotFoundException(RoomNotFoundException ex) {
     return getErrorResponseEntity(NOT_FOUND, "Room Not Found", ex);
+  }
+
+  @ExceptionHandler(ChatNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleChatNotFoundException(ChatNotFoundException ex) {
+    return getErrorResponseEntity(NOT_FOUND, "Chat Not Found", ex);
   }
 
   @ExceptionHandler(MemberNotFoundException.class)

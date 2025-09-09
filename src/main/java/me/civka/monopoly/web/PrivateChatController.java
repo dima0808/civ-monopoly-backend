@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.chat.ChatDto;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,8 +46,8 @@ public class PrivateChatController {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
-  public ChatListDto getAllPrivateChats() {
-    return chatService.getAllPrivateChats();
+  public ChatListDto getAllPrivateChats(@RequestParam(required = false) String username) {
+    return chatService.getAllPrivateChats(username);
   }
 
   @Operation(
@@ -90,8 +92,10 @@ public class PrivateChatController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('USER')")
-  public ChatDto createPrivateChat(String receiverUsername) {
-    return chatService.createPrivateChat(receiverUsername);
+  public ChatDto createPrivateChat(
+      @RequestParam String receiverUsername,
+      @RequestBody @Valid MessageRequestDto messageRequestDto) {
+    return chatService.createPrivateChat(receiverUsername, messageRequestDto);
   }
 
   @Operation(
@@ -116,7 +120,7 @@ public class PrivateChatController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('USER')")
   public MessageDto sendMessage(
-      @PathVariable UUID chatReference, @RequestBody MessageRequestDto messageRequestDto) {
+      @PathVariable UUID chatReference, @RequestBody @Valid MessageRequestDto messageRequestDto) {
     return chatService.sendMessage(chatReference, messageRequestDto);
   }
 

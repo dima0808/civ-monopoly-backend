@@ -1,6 +1,9 @@
 package me.civka.monopoly.service.impl;
 
+import static me.civka.monopoly.util.ChatUtils.sortChatsByLastMessage;
+
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +46,47 @@ public class PrivateChatServiceImpl implements PrivateChatService {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     List<Chat> chats =
         chatRepository.findAllByUsersContaining(user).stream()
-            .peek(
-                c -> {
-                  Message lastMessage =
-                      messageRepository.findTopByChatOrderByTimeStampDesc(c).orElse(null);
-                  c.setMessages(lastMessage == null ? List.of() : List.of(lastMessage));
-                })
+            .peek(this::assignLastMessageToChat)
             .toList();
     return chatMapper.toChatListDto(chats);
+  }
+
+  @Override
+  public ChatListDto getAllPrivateChats(String username) {
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    if (username == null || username.isBlank()) {
+      return getAllPrivateChats();
+    }
+
+    List<Chat> chats = chatRepository.findAllByUsersContaining(user);
+    List<User> matchedUsers =
+        userRepository.findByUsernameContainingIgnoreCase(username).stream()
+            .filter(u -> !u.equalsById(user))
+            .toList();
+
+    List<Chat> resultChats = new ArrayList<>();
+
+    for (User matchedUser : matchedUsers) {
+      Chat chat =
+          chats.stream()
+              .filter(c -> c.getUsers().stream().anyMatch((u) -> u.equalsById(matchedUser)))
+              .findFirst()
+              .orElse(null);
+
+      if (chat != null) {
+        assignLastMessageToChat(chat);
+        resultChats.add(chat);
+      } else {
+        Chat emptyChat =
+            Chat.builder().users(List.of(user, matchedUser)).messages(List.of()).build();
+        resultChats.add(emptyChat);
+      }
+    }
+
+    sortChatsByLastMessage(resultChats);
+
+    return chatMapper.toChatListDto(resultChats);
   }
 
   @Override
@@ -69,20 +105,22 @@ public class PrivateChatServiceImpl implements PrivateChatService {
   }
 
   @Override
-  public ChatDto createPrivateChat(String receiverUsername) {
+  public ChatDto createPrivateChat(String receiverUsername, MessageRequestDto messageRequestDto) {
     User sender = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User receiver =
         userRepository
             .findByUsername(receiverUsername)
             .orElseThrow(() -> new UserNotFoundException(receiverUsername));
 
-    if (chatRepository.existsByUsers(List.of(sender, receiver))) {
+    if (chatRepository.existsByUsersReference(sender.getReference(), receiver.getReference())) {
       throw new ChatAlreadyExistsException(sender.getUsername(), receiver.getUsername());
     }
 
-    Chat chat = Chat.builder().users(List.of(sender, receiver)).build();
+    Chat chat = chatRepository.save(Chat.builder().users(List.of(sender, receiver)).build());
 
-    return chatMapper.toChatDto(chatRepository.save(chat));
+    sendMessage(chat.getReference(), messageRequestDto);
+
+    return chatMapper.toChatDto(chat);
   }
 
   @Override
@@ -97,17 +135,28 @@ public class PrivateChatServiceImpl implements PrivateChatService {
       throw new UserNotAllowedException("User not allowed to send messages in this private chat");
     }
 
-    MessageDto messageDto =
-        messageMapper.toMessageDto(
-            messageRepository.save(
-                Message.builder()
-                    .message(messageRequestDto.getMessage())
-                    .sender(sender)
-                    .chat(chat)
-                    .timeStamp(OffsetDateTime.now())
-                    .build()));
+    User receiver =
+        chat.getUsers().stream()
+            .filter((u) -> !u.equalsById(sender))
+            .findFirst()
+            .orElseThrow(() -> new UserNotFoundException("There is no receiver in this chat"));
+
+    Message message =
+        messageRepository.save(
+            Message.builder()
+                .message(messageRequestDto.getMessage())
+                .sender(sender)
+                .chat(chat)
+                .timeStamp(OffsetDateTime.now())
+                .build());
+    MessageDto messageDto = messageMapper.toMessageDto(message);
+
+    chat.getMessages().add(message); // for display purposes
+    ChatDto chatDto = chatMapper.toChatDto(chat);
 
     convertAndSendTo("/topic/chats/" + chatReference, messageDto, MessageType.SEND);
+    convertAndSendToUser(sender.getUsername(), "/chats/contacts", chatDto, MessageType.SEND);
+    convertAndSendToUser(receiver.getUsername(), "/chats/contacts", chatDto, MessageType.SEND);
 
     return messageDto;
   }
@@ -135,5 +184,16 @@ public class PrivateChatServiceImpl implements PrivateChatService {
   private void convertAndSendTo(String destination, MessageDto messageDto, MessageType type) {
     messagingTemplate.convertAndSend(
         destination, ChatMessage.builder().message(messageDto).type(type).build());
+  }
+
+  private void convertAndSendToUser(
+      String username, String destination, ChatDto chatDto, MessageType type) {
+    messagingTemplate.convertAndSendToUser(
+        username, destination, ChatMessage.builder().chat(chatDto).type(type).build());
+  }
+
+  private void assignLastMessageToChat(Chat chat) {
+    Message lastMessage = messageRepository.findTopByChatOrderByTimeStampDesc(chat).orElse(null);
+    chat.setMessages(lastMessage == null ? List.of() : List.of(lastMessage));
   }
 }

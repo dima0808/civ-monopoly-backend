@@ -20,6 +20,7 @@ public class RoomDto {
   private UUID reference;
   private String name;
   private Integer memberLimit;
+  private Boolean hasPassword;
   private Boolean isStarted;
   private Integer turnIndex;
   private List<MemberDto> members;

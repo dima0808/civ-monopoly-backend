@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.civka.monopoly.dto.chat.ChatDto;
 import me.civka.monopoly.dto.message.MessageDto;
 
 @NoArgsConstructor
@@ -15,6 +16,7 @@ import me.civka.monopoly.dto.message.MessageDto;
 public class ChatMessage {
 
   private MessageDto message;
+  private ChatDto chat;
   private MessageType type;
 
   public enum MessageType {

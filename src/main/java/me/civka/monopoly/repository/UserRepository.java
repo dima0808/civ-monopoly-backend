@@ -1,5 +1,6 @@
 package me.civka.monopoly.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import me.civka.monopoly.repository.entity.User;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
   Optional<User> findByUsername(String username);
+
+  List<User> findByUsernameContainingIgnoreCase(String username);
 
   boolean existsByUsername(String username);
 }

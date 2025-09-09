@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class Room {
       fetch = FetchType.EAGER,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE},
       orphanRemoval = true)
+  @OrderBy("joinedAt ASC")
   private List<Member> members = new ArrayList<>();
 
   public boolean equalsById(Room room) {

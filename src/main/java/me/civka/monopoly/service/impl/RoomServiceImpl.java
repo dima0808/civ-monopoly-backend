@@ -1,5 +1,6 @@
 package me.civka.monopoly.service.impl;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -232,6 +233,7 @@ public class RoomServiceImpl implements RoomService {
             .strength(STRENGTH_START_VALUE)
             .tourism(TOURISM_START_VALUE)
             .score(SCORE_START_VALUE)
+            .joinedAt(OffsetDateTime.now())
             .user(user)
             .room(room)
             .build();

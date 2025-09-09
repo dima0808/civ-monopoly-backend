@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.chat.ChatDto;
@@ -121,7 +122,7 @@ public class PublicChatController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('USER')")
   public MessageDto sendMessage(
-      @PathVariable UUID chatReference, @RequestBody MessageRequestDto messageRequestDto) {
+      @PathVariable UUID chatReference, @RequestBody @Valid MessageRequestDto messageRequestDto) {
     return chatService.sendMessage(chatReference, messageRequestDto);
   }
 

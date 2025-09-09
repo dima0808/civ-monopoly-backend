@@ -1,14 +1,13 @@
 package me.civka.monopoly.config;
 
 import jakarta.transaction.Transactional;
-import java.util.UUID;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.repository.AuthorityRepository;
 import me.civka.monopoly.repository.ChatRepository;
 import me.civka.monopoly.repository.entity.Authority;
 import me.civka.monopoly.repository.entity.Authority.AuthorityName;
 import me.civka.monopoly.repository.entity.Chat;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
@@ -21,9 +20,6 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
   private final AuthorityRepository authorityRepository;
 
   private final ChatRepository chatRepository;
-
-  @Value("${app.chat.public-chat-reference}")
-  private String publicChatReference;
 
   @Override
   @Transactional
@@ -44,12 +40,11 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
   }
 
   private void createPublicChatIfNotFound() {
-    if (chatRepository.existsById(UUID.fromString(publicChatReference))) {
+    if (chatRepository.existsByUsersAndRoom(List.of(), null)) {
       return;
     }
 
     Chat publicChat = chatRepository.save(Chat.builder().build());
-    //    publicChat.setReference(UUID.fromString(publicChatReference));
     chatRepository.save(publicChat);
   }
 }

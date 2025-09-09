@@ -15,7 +15,7 @@ import lombok.Setter;
 @Builder
 public class MessageRequestDto {
 
-  @NotBlank
-  @Size(min = 1, max = 50, message = "Message must be between 1 and 50 characters")
+  @NotBlank(message = "Message cannot be blank")
+  @Size(min = 1, max = 250, message = "Message must be between 1 and 50 characters")
   private String message;
 }
