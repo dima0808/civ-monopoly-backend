@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,7 @@ public class Chat {
       fetch = FetchType.LAZY,
       cascade = CascadeType.ALL,
       orphanRemoval = true)
+  @OrderBy("timeStamp ASC")
   private List<Message> messages;
 
   public boolean isPublic() {

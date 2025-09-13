@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.room.RoomCreateRequestDto;
 import me.civka.monopoly.dto.room.RoomDto;
 import me.civka.monopoly.dto.room.RoomListDto;
+import me.civka.monopoly.message.NotificationMessage;
+import me.civka.monopoly.message.NotificationMessage.NotificationType;
 import me.civka.monopoly.message.RoomMessage;
 import me.civka.monopoly.message.RoomMessage.MessageType;
 import me.civka.monopoly.repository.ChatRepository;
@@ -160,6 +162,8 @@ public class RoomServiceImpl implements RoomService {
 
     convertAndSendTo(
         List.of("/topic/rooms", "/topic/rooms/" + room.getReference()), roomDto, MessageType.LEAVE);
+    notifyUser(
+        room.getMembers().getFirst().getUser().getUsername(), NotificationType.USER_BECAME_OWNER);
 
     return roomDto;
   }
@@ -197,6 +201,7 @@ public class RoomServiceImpl implements RoomService {
 
     convertAndSendTo(
         List.of("/topic/rooms", "/topic/rooms/" + room.getReference()), roomDto, MessageType.KICK);
+    notifyUser(memberToKick.getUser().getUsername(), NotificationType.USER_WAS_KICKED);
 
     return roomDto;
   }
@@ -260,8 +265,12 @@ public class RoomServiceImpl implements RoomService {
   }
 
   private void convertAndSendTo(String destination, RoomDto roomDto, MessageType type) {
-    messagingTemplate.convertAndSend(
-        destination, RoomMessage.builder().room(roomDto).type(type).build());
+    messagingTemplate.convertAndSend(destination, RoomMessage.of(roomDto, type));
+  }
+
+  private void notifyUser(String username, NotificationType notificationType) {
+    messagingTemplate.convertAndSendToUser(
+        username, "/notifications", NotificationMessage.of(notificationType));
   }
 
   private void convertAndSendTo(List<String> destinations, RoomDto roomDto, MessageType type) {

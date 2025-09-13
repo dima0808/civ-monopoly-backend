@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.chat.ChatDto;
 import me.civka.monopoly.dto.chat.ChatListDto;
@@ -13,6 +14,8 @@ import me.civka.monopoly.dto.message.MessageDto;
 import me.civka.monopoly.dto.message.MessageRequestDto;
 import me.civka.monopoly.message.ChatMessage;
 import me.civka.monopoly.message.ChatMessage.MessageType;
+import me.civka.monopoly.message.NotificationMessage;
+import me.civka.monopoly.message.NotificationMessage.NotificationType;
 import me.civka.monopoly.repository.ChatRepository;
 import me.civka.monopoly.repository.MessageRepository;
 import me.civka.monopoly.repository.UserRepository;
@@ -47,7 +50,10 @@ public class PrivateChatServiceImpl implements PrivateChatService {
     List<Chat> chats =
         chatRepository.findAllByUsersContaining(user).stream()
             .peek(this::assignLastMessageToChat)
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    sortChatsByLastMessage(chats, true);
+
     return chatMapper.toChatListDto(chats);
   }
 
@@ -154,42 +160,66 @@ public class PrivateChatServiceImpl implements PrivateChatService {
     chat.getMessages().add(message); // for display purposes
     ChatDto chatDto = chatMapper.toChatDto(chat);
 
-    convertAndSendTo("/topic/chats/" + chatReference, messageDto, MessageType.SEND);
-    convertAndSendToUser(sender.getUsername(), "/chats/contacts", chatDto, MessageType.SEND);
-    convertAndSendToUser(receiver.getUsername(), "/chats/contacts", chatDto, MessageType.SEND);
+    broadcastChatMessage(chatReference, messageDto, MessageType.SEND);
+    updateUserContacts(sender.getUsername(), chatDto, MessageType.SEND);
+    updateUserContacts(receiver.getUsername(), chatDto, MessageType.SEND);
+    notifyUser(receiver.getUsername(), messageDto, NotificationType.PRIVATE_MESSAGE_SENT);
 
     return messageDto;
   }
 
   @Override
   public void deleteMessage(UUID chatReference, UUID messageReference) {
-    User user = (User) SecurityContextHolder.getContext().getAuthentication();
+    User sender = (User) SecurityContextHolder.getContext().getAuthentication();
+    Chat chat =
+        chatRepository
+            .findById(chatReference)
+            .orElseThrow(() -> new ChatNotFoundException(chatReference));
 
-    if (!chatRepository.existsByUsersContainsAndReference(user, chatReference)) {
+    if (chat.isUserAbsent(sender)) {
       throw new UserNotAllowedException("User not allowed to delete messages in this chat");
     }
+
+    User receiver =
+        chat.getUsers().stream()
+            .filter((u) -> !u.equalsById(sender))
+            .findFirst()
+            .orElseThrow(() -> new UserNotFoundException("There is no receiver in this chat"));
 
     messageRepository
         .findByChatReferenceAndReference(chatReference, messageReference)
         .ifPresent(
             (message) -> {
               messageRepository.deleteById(messageReference);
-              convertAndSendTo(
-                  "/topic/chats/" + chatReference,
-                  messageMapper.toMessageDto(Message.builder().reference(messageReference).build()),
-                  MessageType.DELETE);
+              MessageDto messageDto = messageMapper.toMessageDto(message);
+
+              boolean isLast =
+                  !chat.getMessages().isEmpty()
+                      && chat.getMessages().getLast().getReference().equals(messageReference);
+
+              if (isLast) {
+                chat.getMessages().removeLast(); // for display purposes
+                ChatDto chatDto = chatMapper.toChatDto(chat);
+                updateUserContacts(sender.getUsername(), chatDto, MessageType.DELETE);
+                updateUserContacts(receiver.getUsername(), chatDto, MessageType.DELETE);
+              }
+              broadcastChatMessage(chatReference, messageDto, MessageType.DELETE);
             });
   }
 
-  private void convertAndSendTo(String destination, MessageDto messageDto, MessageType type) {
+  private void broadcastChatMessage(UUID chatReference, MessageDto messageDto, MessageType type) {
     messagingTemplate.convertAndSend(
-        destination, ChatMessage.builder().message(messageDto).type(type).build());
+        "/topic/chats/" + chatReference, ChatMessage.of(messageDto, type));
   }
 
-  private void convertAndSendToUser(
-      String username, String destination, ChatDto chatDto, MessageType type) {
+  private void updateUserContacts(String username, ChatDto chatDto, MessageType type) {
     messagingTemplate.convertAndSendToUser(
-        username, destination, ChatMessage.builder().chat(chatDto).type(type).build());
+        username, "/chats/contacts", ChatMessage.of(chatDto, type));
+  }
+
+  private void notifyUser(String username, MessageDto messageDto, NotificationType type) {
+    messagingTemplate.convertAndSendToUser(
+        username, "/notifications", NotificationMessage.of(messageDto, type));
   }
 
   private void assignLastMessageToChat(Chat chat) {

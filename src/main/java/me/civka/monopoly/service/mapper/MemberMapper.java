@@ -11,8 +11,14 @@ import org.mapstruct.Named;
 public interface MemberMapper {
 
   @Mapping(target = "username", source = "user.username")
+  @Mapping(target = "color", source = "color", qualifiedByName = "colorToLowercase")
   MemberDto toMemberDto(Member member);
 
   @Named("toMemberDto")
   List<MemberDto> toMemberDto(List<Member> members);
+
+  @Named("colorToLowercase")
+  default String colorToLowercase(Member.Color color) {
+    return color == null ? null : color.name().toLowerCase();
+  }
 }

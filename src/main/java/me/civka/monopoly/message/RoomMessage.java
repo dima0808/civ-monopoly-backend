@@ -1,21 +1,12 @@
 package me.civka.monopoly.message;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import me.civka.monopoly.dto.room.RoomDto;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
-public class RoomMessage {
+public record RoomMessage(RoomDto room, MessageType type) {
 
-  private RoomDto room;
-  private MessageType type;
+  public static RoomMessage of(RoomDto room, MessageType type) {
+    return new RoomMessage(room, type);
+  }
 
   public enum MessageType {
     CREATE,

@@ -26,8 +26,6 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
   @EntityGraph(attributePaths = {"users"})
   List<Chat> findAllByUsersContaining(User user);
 
-  boolean existsByUsersContainsAndReference(User user, UUID reference);
-
   @Query(
       value =
           """

@@ -107,7 +107,7 @@ public class PublicChatServiceImpl implements PublicChatService {
 
     MessageDto messageDto = messageMapper.toMessageDto(message);
 
-    convertAndSendTo("/topic/chats/" + chatReference, messageDto, MessageType.SEND);
+    broadcastChatMessage(chatReference, messageDto, MessageType.SEND);
 
     return messageDto;
   }
@@ -126,12 +126,11 @@ public class PublicChatServiceImpl implements PublicChatService {
 
     messageRepository.delete(message);
 
-    convertAndSendTo(
-        "/topic/chats/" + chatReference, messageMapper.toMessageDto(message), MessageType.DELETE);
+    broadcastChatMessage(chatReference, messageMapper.toMessageDto(message), MessageType.DELETE);
   }
 
-  private void convertAndSendTo(String destination, MessageDto messageDto, MessageType type) {
+  private void broadcastChatMessage(UUID chatReference, MessageDto messageDto, MessageType type) {
     messagingTemplate.convertAndSend(
-        destination, ChatMessage.builder().message(messageDto).type(type).build());
+        "/topic/chats/" + chatReference, ChatMessage.of(messageDto, type));
   }
 }
