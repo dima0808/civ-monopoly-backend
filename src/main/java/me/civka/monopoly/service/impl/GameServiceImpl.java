@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.dto.game.CivilizationListDto;
+import me.civka.monopoly.dto.game.ColorListDto;
 import me.civka.monopoly.dto.room.RoomDto;
 import me.civka.monopoly.dto.room.ext.DiceResult;
 import me.civka.monopoly.dto.room.ext.RoomExtraData;
@@ -37,6 +39,18 @@ public class GameServiceImpl implements GameService {
   private final Random random = new Random();
   private final PropertyRepository propertyRepository;
   private final MemberRepository memberRepository;
+
+  @Override
+  public CivilizationListDto getAllCivilizations() {
+    List<String> civilizations = Arrays.stream(Civilization.values()).map(Enum::toString).toList();
+    return new CivilizationListDto(civilizations);
+  }
+
+  @Override
+  public ColorListDto getAllColors() {
+    List<String> colors = Arrays.stream(Member.Color.values()).map(Enum::toString).toList();
+    return new ColorListDto(colors);
+  }
 
   @Override
   public RoomDto startGame() {

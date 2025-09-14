@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/config")
+@RequestMapping("/api/v1/configs")
 @RequiredArgsConstructor
 public class ConfigController {
 

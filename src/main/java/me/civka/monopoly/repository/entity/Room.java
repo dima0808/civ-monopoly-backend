@@ -5,12 +5,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +27,7 @@ import lombok.Setter;
 @Table(name = "rooms")
 public class Room {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID reference;
+  @Id private UUID reference;
 
   @Column(nullable = false)
   private String name;
@@ -64,6 +61,13 @@ public class Room {
       orphanRemoval = true)
   @OrderBy("joinedAt ASC")
   private List<Member> members = new ArrayList<>();
+
+  @PrePersist
+  public void prePersist() {
+    if (reference == null) {
+      reference = UUID.randomUUID(); // fallback
+    }
+  }
 
   public boolean equalsById(Room room) {
     return room != null && room.getReference().equals(reference);

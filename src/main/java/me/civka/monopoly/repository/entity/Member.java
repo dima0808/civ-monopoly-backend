@@ -69,13 +69,16 @@ public class Member {
 
   public enum Civilization {
     RANDOM,
+    AMERICA,
+    AZTEC,
+    BABYLON,
     COLOMBIA,
     EGYPT,
-    GERMANY,
+    ENGLAND,
+    FRANCE,
+    GAUL,
     JAPAN,
-    KOREA,
-    ROME,
-    SWEDEN,
+    OTTOMAN,
   }
 
   public enum Color {

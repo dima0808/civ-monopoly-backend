@@ -23,6 +23,8 @@ public class RoomDto {
   private Boolean hasPassword;
   private Boolean isStarted;
   private Integer turnIndex;
+  private Boolean isDiceRolled;
+  private Integer turn;
   private List<MemberDto> members;
 
   private RoomExtraData ext;

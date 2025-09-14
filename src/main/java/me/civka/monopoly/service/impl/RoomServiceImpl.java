@@ -150,6 +150,7 @@ public class RoomServiceImpl implements RoomService {
             .getRoomByMembersContaining(user.getMember())
             .orElseThrow(() -> new RoomNotFoundException(user.getMember()));
 
+    boolean isOwnerLeaving = room.isOwnedBy(user);
     unassignUserFromRoom(user, room);
 
     RoomDto roomDto = roomMapper.toRoomDto(room);
@@ -162,8 +163,10 @@ public class RoomServiceImpl implements RoomService {
 
     convertAndSendTo(
         List.of("/topic/rooms", "/topic/rooms/" + room.getReference()), roomDto, MessageType.LEAVE);
-    notifyUser(
-        room.getMembers().getFirst().getUser().getUsername(), NotificationType.USER_BECAME_OWNER);
+    if (isOwnerLeaving) {
+      notifyUser(
+          room.getMembers().getFirst().getUser().getUsername(), NotificationType.USER_BECAME_OWNER);
+    }
 
     return roomDto;
   }

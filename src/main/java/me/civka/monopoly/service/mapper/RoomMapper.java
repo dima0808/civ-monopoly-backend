@@ -12,6 +12,7 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring", uses = MemberMapper.class)
 public interface RoomMapper {
 
+  @Mapping(target = "reference", expression = "java(java.util.UUID.randomUUID())")
   Room toRoomEntity(RoomCreateRequestDto roomCreateRequestDto);
 
   @Mapping(target = "members", source = "members", qualifiedByName = "toMemberDto")
