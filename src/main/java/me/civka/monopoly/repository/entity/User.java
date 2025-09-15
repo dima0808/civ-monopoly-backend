@@ -28,12 +28,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "users")
 public class User implements UserDetails {
 
+  public static final String DEFAULT_AVATAR_URL = "/images/default/avatar.png";
+
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID reference;
 
   @Column(nullable = false, unique = true)
   private String username;
+
+  private String avatarUrl = DEFAULT_AVATAR_URL;
 
   @Column(nullable = false)
   private String password;

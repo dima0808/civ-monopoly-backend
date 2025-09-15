@@ -71,6 +71,26 @@ public class PrivateChatController {
     return chatService.getPrivateChatByReference(chatReference);
   }
 
+  @Operation(summary = "Get private chat by usernames")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Private chat found",
+            content = @Content(schema = @Schema(implementation = ChatDto.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Private chat not found",
+            content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+      })
+  @GetMapping("/between")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public ChatDto getPrivateChatByUsernames(
+      @RequestParam String username1, @RequestParam String username2) {
+    return chatService.getPrivateChatByUsernames(username1, username2);
+  }
+
   @Operation(
       summary = "Create a private chat",
       description = "Creates a new private chat with the specified user.")

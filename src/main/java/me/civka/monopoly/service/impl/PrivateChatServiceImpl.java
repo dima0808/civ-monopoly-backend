@@ -5,6 +5,7 @@ import static me.civka.monopoly.util.ChatUtils.sortChatsByLastMessage;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +86,7 @@ public class PrivateChatServiceImpl implements PrivateChatService {
         resultChats.add(chat);
       } else {
         Chat emptyChat =
-            Chat.builder().users(List.of(user, matchedUser)).messages(List.of()).build();
+            Chat.builder().users(Set.of(user, matchedUser)).messages(List.of()).build();
         resultChats.add(emptyChat);
       }
     }
@@ -111,6 +112,16 @@ public class PrivateChatServiceImpl implements PrivateChatService {
   }
 
   @Override
+  public ChatDto getPrivateChatByUsernames(String username1, String username2) {
+    Chat chat =
+        chatRepository
+            .findByUsernames(username1, username2)
+            .orElseThrow(() -> new ChatNotFoundException(username1, username2));
+    assignLastMessageToChat(chat);
+    return chatMapper.toChatDto(chat);
+  }
+
+  @Override
   public ChatDto createPrivateChat(String receiverUsername, MessageRequestDto messageRequestDto) {
     User sender = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User receiver =
@@ -122,7 +133,7 @@ public class PrivateChatServiceImpl implements PrivateChatService {
       throw new ChatAlreadyExistsException(sender.getUsername(), receiver.getUsername());
     }
 
-    Chat chat = chatRepository.save(Chat.builder().users(List.of(sender, receiver)).build());
+    Chat chat = chatRepository.save(Chat.builder().users(Set.of(sender, receiver)).build());
 
     sendMessage(chat.getReference(), messageRequestDto);
 

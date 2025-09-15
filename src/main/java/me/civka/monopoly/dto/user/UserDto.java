@@ -16,4 +16,5 @@ public class UserDto {
 
   private UUID reference;
   private String username;
+  private String avatarUrl;
 }

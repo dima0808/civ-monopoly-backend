@@ -11,6 +11,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,7 @@ public class Chat {
   @Id private UUID reference;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  private List<User> users; // not null if private chat
+  private Set<User> users; // not null if private chat
 
   @OneToOne(fetch = FetchType.EAGER)
   private Room room; // not null if public chat

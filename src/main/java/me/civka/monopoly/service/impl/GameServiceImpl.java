@@ -1,5 +1,7 @@
 package me.civka.monopoly.service.impl;
 
+import static me.civka.monopoly.event.GlobalGameScheduler.createTimer;
+import static me.civka.monopoly.event.GlobalGameScheduler.delegateTimer;
 import static me.civka.monopoly.util.GameUtils.BOARD_SIZE;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.game.CivilizationListDto;
@@ -15,6 +18,8 @@ import me.civka.monopoly.dto.game.ColorListDto;
 import me.civka.monopoly.dto.room.RoomDto;
 import me.civka.monopoly.dto.room.ext.DiceResult;
 import me.civka.monopoly.dto.room.ext.RoomExtraData;
+import me.civka.monopoly.message.GameMessage;
+import me.civka.monopoly.message.GameMessage.MessageType;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
@@ -26,6 +31,7 @@ import me.civka.monopoly.service.GameService;
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
 import me.civka.monopoly.service.mapper.RoomMapper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,6 +45,7 @@ public class GameServiceImpl implements GameService {
   private final Random random = new Random();
   private final PropertyRepository propertyRepository;
   private final MemberRepository memberRepository;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Override
   public CivilizationListDto getAllCivilizations() {
@@ -69,7 +76,12 @@ public class GameServiceImpl implements GameService {
 
     delegateNextTurn(room);
 
-    return roomMapper.toRoomDto(roomRepository.save(room));
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    convertAndSendTo(room.getReference(), roomDto, MessageType.START);
+
+    createTimer(room.getReference());
+
+    return roomDto;
   }
 
   @Override
@@ -90,12 +102,16 @@ public class GameServiceImpl implements GameService {
 
     int firstRoll = random.nextInt(DICE_SIZE) + 1;
     int secondRoll = random.nextInt(DICE_SIZE) + 1;
-    room.setIsDiceRolled(true);
     member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
-
     memberRepository.save(member);
+
+    room.setIsDiceRolled(true);
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
     roomDto.setExt(RoomExtraData.of(new DiceResult(firstRoll, secondRoll)));
+    convertAndSendTo(room.getReference(), roomDto, MessageType.ROLL_DICE);
+
+    delegateTimer(room.getReference());
+
     return roomDto;
   }
 
@@ -118,7 +134,50 @@ public class GameServiceImpl implements GameService {
 
     delegateNextTurn(room);
 
-    return roomMapper.toRoomDto(roomRepository.save(room));
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    convertAndSendTo(room.getReference(), roomDto, MessageType.END_TURN);
+
+    delegateTimer(room.getReference());
+
+    return roomDto;
+  }
+
+  @Override
+  public void forceRollDice(UUID roomReference) {
+    Room room =
+        roomRepository
+            .findById(roomReference)
+            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+
+    int firstRoll = random.nextInt(DICE_SIZE) + 1;
+    int secondRoll = random.nextInt(DICE_SIZE) + 1;
+
+    Member member = room.getMembers().get(room.getTurnIndex());
+    member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
+    memberRepository.save(member);
+
+    room.setIsDiceRolled(true);
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    roomDto.setExt(RoomExtraData.of(new DiceResult(firstRoll, secondRoll)));
+    convertAndSendTo(room.getReference(), roomDto, MessageType.FORCE_ROLL_DICE);
+
+    delegateTimer(room.getReference());
+  }
+
+  @Override
+  @Transactional
+  public void forceEndTurn(UUID roomReference) {
+    Room room =
+        roomRepository
+            .findById(roomReference)
+            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+
+    delegateNextTurn(room);
+
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    convertAndSendTo(roomReference, roomDto, MessageType.FORCE_END_TURN);
+
+    delegateTimer(room.getReference());
   }
 
   private void delegateNextTurn(Room room) {
@@ -167,5 +226,10 @@ public class GameServiceImpl implements GameService {
         availableCivilizations.remove(randomIndex);
       }
     }
+  }
+
+  private void convertAndSendTo(UUID roomReference, RoomDto memberDto, MessageType type) {
+    messagingTemplate.convertAndSend(
+        "/topic/games/" + roomReference, GameMessage.of(memberDto, type));
   }
 }

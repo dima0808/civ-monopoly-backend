@@ -1,5 +1,6 @@
 package me.civka.monopoly.service.impl;
 
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -210,6 +211,7 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
+  @Transactional
   public void deleteRoom() {
     User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     Room room =

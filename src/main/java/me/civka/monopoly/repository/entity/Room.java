@@ -37,7 +37,7 @@ public class Room {
 
   private String password;
 
-  @Embedded private RoomState state;
+  @Embedded private RoomState state = new RoomState();
 
   @Column(nullable = false)
   private Boolean isStarted = false;

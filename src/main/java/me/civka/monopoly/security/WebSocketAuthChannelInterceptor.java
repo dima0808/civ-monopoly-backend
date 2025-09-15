@@ -6,6 +6,7 @@ import me.civka.monopoly.repository.ChatRepository;
 import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.AuthService;
+import me.civka.monopoly.service.exception.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
@@ -67,9 +68,13 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
       }
 
       if (!chat.isPublic()) {
-        Authentication authentication =
-            authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
-        if (authentication == null || chat.isUserAbsent((User) authentication.getPrincipal())) {
+        try {
+          Authentication authentication =
+              authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
+          if (authentication == null || chat.isUserAbsent((User) authentication.getPrincipal())) {
+            return null;
+          }
+        } catch (UserNotFoundException e) {
           return null;
         }
       }
@@ -85,15 +90,19 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     }
 
     if (destination.startsWith(USER_DESTINATION_PREFIX)) {
-      Authentication authentication =
-          authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
-      if (authentication == null) {
-        return null;
-      }
+      try {
+        Authentication authentication =
+            authService.authenticate(accessor.getFirstNativeHeader(AUTHORIZATION_HEADER));
+        if (authentication == null) {
+          return null;
+        }
 
-      String username = destination.split("/")[2];
+        String username = destination.split("/")[2];
 
-      if (!authentication.getName().equals(username)) {
+        if (!authentication.getName().equals(username)) {
+          return null;
+        }
+      } catch (UserNotFoundException e) {
         return null;
       }
     }

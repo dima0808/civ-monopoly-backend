@@ -44,6 +44,9 @@ public class MemberServiceImpl implements MemberService {
             m -> m.getCivilization() == civilization && civilization != Civilization.RANDOM)) {
       throw new UserNotAllowedException("Civilization already taken in this room.");
     }
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("Cannot change civilization after the game has started.");
+    }
 
     member.setCivilization(civilization);
     MemberDto memberDto = memberMapper.toMemberDto(memberRepository.save(member));
@@ -65,6 +68,9 @@ public class MemberServiceImpl implements MemberService {
 
     if (room.getMembers().stream().anyMatch(m -> m.getColor() == color)) {
       throw new UserNotAllowedException("Color already taken in this room.");
+    }
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("Cannot change color after the game has started.");
     }
 
     member.setColor(color);

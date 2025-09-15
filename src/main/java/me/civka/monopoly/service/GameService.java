@@ -1,5 +1,6 @@
 package me.civka.monopoly.service;
 
+import java.util.UUID;
 import me.civka.monopoly.dto.game.CivilizationListDto;
 import me.civka.monopoly.dto.game.ColorListDto;
 import me.civka.monopoly.dto.room.RoomDto;
@@ -15,4 +16,8 @@ public interface GameService {
   RoomDto rollDice();
 
   RoomDto endTurn();
+
+  void forceRollDice(UUID roomReference);
+
+  void forceEndTurn(UUID roomReference);
 }

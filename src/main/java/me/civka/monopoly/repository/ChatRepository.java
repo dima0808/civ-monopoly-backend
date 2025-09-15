@@ -2,6 +2,7 @@ package me.civka.monopoly.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.Room;
@@ -37,5 +38,21 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
       """)
   boolean existsByUsersReference(@Param("ref1") UUID userRef1, @Param("ref2") UUID userRef2);
 
-  boolean existsByUsersAndRoom(List<User> users, Room room);
+  @Query(
+      value =
+          """
+    SELECT c
+    FROM Chat c
+    WHERE EXISTS (
+        SELECT 1 FROM c.users u1 WHERE u1.username = :username1
+    )
+    AND EXISTS (
+        SELECT 1 FROM c.users u2 WHERE u2.username = :username2
+    )
+    """)
+  @EntityGraph(attributePaths = {"users"})
+  Optional<Chat> findByUsernames(
+      @Param("username1") String username1, @Param("username2") String username2);
+
+  boolean existsByUsersAndRoom(Set<User> users, Room room);
 }

@@ -13,5 +13,5 @@ import lombok.Setter;
 @Setter
 public class RoomState {
 
-  private Integer firstTurnIndex;
+  private Integer firstTurnIndex = -1;
 }

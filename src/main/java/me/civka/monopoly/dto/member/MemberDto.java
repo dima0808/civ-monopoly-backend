@@ -13,6 +13,7 @@ public class MemberDto {
   private UUID reference;
   private String civilization;
   private String color;
+  private Integer position;
   private Integer gold;
   private Integer strength;
   private Integer tourism;

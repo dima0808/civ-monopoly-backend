@@ -13,5 +13,7 @@ public interface PrivateChatService extends ChatService {
 
   ChatDto getPrivateChatByReference(UUID chatReference);
 
+  ChatDto getPrivateChatByUsernames(String username1, String username2);
+
   ChatDto createPrivateChat(String receiverUsername, MessageRequestDto messageRequestDto);
 }

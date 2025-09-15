@@ -1,6 +1,7 @@
 package me.civka.monopoly.service.mapper;
 
 import java.util.List;
+import java.util.Set;
 import me.civka.monopoly.dto.chat.ChatDto;
 import me.civka.monopoly.dto.chat.ChatListDto;
 import me.civka.monopoly.repository.entity.Chat;
@@ -25,7 +26,7 @@ public interface ChatMapper {
   }
 
   @Named("toUsername")
-  default List<String> toUsername(List<User> users) {
+  default List<String> toUsername(Set<User> users) {
     return users.stream().map(User::getUsername).toList();
   }
 }
