@@ -19,4 +19,5 @@ public class MemberDto {
   private Integer tourism;
   private Integer score;
   private String username;
+  private String avatarUrl;
 }

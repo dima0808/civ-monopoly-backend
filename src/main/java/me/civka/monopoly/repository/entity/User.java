@@ -1,6 +1,7 @@
 package me.civka.monopoly.repository.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +45,8 @@ public class User implements UserDetails {
 
   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
   private Member member;
+
+  @Embedded private UserStats stats = new UserStats();
 
   @ManyToMany(fetch = FetchType.EAGER)
   private Set<Authority> authorities;

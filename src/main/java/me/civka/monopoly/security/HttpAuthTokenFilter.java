@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.NoArgsConstructor;
 import me.civka.monopoly.service.AuthService;
+import me.civka.monopoly.service.exception.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
@@ -26,7 +27,10 @@ public class HttpAuthTokenFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws IOException, ServletException {
 
-    authService.authenticate(request.getHeader(HttpHeaders.AUTHORIZATION));
+    try {
+      authService.authenticate(request.getHeader(HttpHeaders.AUTHORIZATION));
+    } catch (UserNotFoundException ignored) {
+    }
 
     filterChain.doFilter(request, response);
   }

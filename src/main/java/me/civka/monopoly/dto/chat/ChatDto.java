@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.civka.monopoly.dto.message.MessageDto;
+import me.civka.monopoly.dto.user.UserDto;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +18,6 @@ import me.civka.monopoly.dto.message.MessageDto;
 public class ChatDto {
 
   private UUID reference;
-  private List<String> users;
+  private List<UserDto> users;
   private List<MessageDto> messages;
 }

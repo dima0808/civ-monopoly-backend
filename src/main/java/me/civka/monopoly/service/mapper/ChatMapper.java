@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import me.civka.monopoly.dto.chat.ChatDto;
 import me.civka.monopoly.dto.chat.ChatListDto;
+import me.civka.monopoly.dto.user.UserDto;
 import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.User;
 import org.mapstruct.Mapper;
@@ -15,7 +16,7 @@ import org.mapstruct.Named;
     uses = {MessageMapper.class})
 public interface ChatMapper {
 
-  @Mapping(target = "users", source = "users", qualifiedByName = "toUsername")
+  @Mapping(target = "users", source = "users", qualifiedByName = "toUserDto")
   @Mapping(target = "messages", source = "messages", qualifiedByName = "toMessageDto")
   ChatDto toChatDto(Chat chat);
 
@@ -25,8 +26,10 @@ public interface ChatMapper {
     return new ChatListDto(toChatDto(chats));
   }
 
-  @Named("toUsername")
-  default List<String> toUsername(Set<User> users) {
-    return users.stream().map(User::getUsername).toList();
+  @Named("toUserDto")
+  default List<UserDto> toUserDto(Set<User> users) {
+    return users.stream()
+        .map((u) -> UserDto.builder().username(u.getUsername()).avatarUrl(u.getAvatarUrl()).build())
+        .toList();
   }
 }

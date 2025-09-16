@@ -1,6 +1,5 @@
 package me.civka.monopoly.service.impl;
 
-import static me.civka.monopoly.event.GlobalGameScheduler.createTimer;
 import static me.civka.monopoly.event.GlobalGameScheduler.delegateTimer;
 import static me.civka.monopoly.util.GameUtils.BOARD_SIZE;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
@@ -67,6 +66,10 @@ public class GameServiceImpl implements GameService {
             .getRoomByMembersContaining(member)
             .orElseThrow(() -> new RoomNotFoundException(member));
 
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("Game has already been started.");
+    }
+
     if (!room.isOwnedBy(member.getUser())) {
       throw new UserNotAllowedException("User are not allowed to start the properties.");
     }
@@ -79,37 +82,6 @@ public class GameServiceImpl implements GameService {
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
     convertAndSendTo(room.getReference(), roomDto, MessageType.START);
 
-    createTimer(room.getReference());
-
-    return roomDto;
-  }
-
-  @Override
-  public RoomDto rollDice() {
-    Member member = getMemberFromAuthentication();
-    Room room =
-        roomRepository
-            .getRoomByMembersContaining(member)
-            .orElseThrow(() -> new RoomNotFoundException(member));
-
-    if (!member.equalsById(room.getMembers().get(room.getTurnIndex()))) {
-      throw new UserNotAllowedException("It is not user's turn.");
-    }
-
-    if (room.getIsDiceRolled()) {
-      throw new UserNotAllowedException("User has already rolled the dice this turn.");
-    }
-
-    int firstRoll = random.nextInt(DICE_SIZE) + 1;
-    int secondRoll = random.nextInt(DICE_SIZE) + 1;
-    member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
-    memberRepository.save(member);
-
-    room.setIsDiceRolled(true);
-    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
-    roomDto.setExt(RoomExtraData.of(new DiceResult(firstRoll, secondRoll)));
-    convertAndSendTo(room.getReference(), roomDto, MessageType.ROLL_DICE);
-
     delegateTimer(room.getReference());
 
     return roomDto;
@@ -117,51 +89,37 @@ public class GameServiceImpl implements GameService {
 
   @Override
   @Transactional
-  public RoomDto endTurn() {
-    Member member = getMemberFromAuthentication();
-    Room room =
-        roomRepository
-            .getRoomByMembersContaining(member)
-            .orElseThrow(() -> new RoomNotFoundException(member));
+  public RoomDto rollDice() {
+    Room room = getRoomForTurn();
 
-    if (!member.equalsById(room.getMembers().get(room.getTurnIndex()))) {
-      throw new UserNotAllowedException("It is not user's turn.");
+    if (room.getIsDiceRolled()) {
+      throw new UserNotAllowedException("User has already rolled the dice this turn.");
     }
+
+    return handleRollDice(room, false);
+  }
+
+  @Override
+  @Transactional
+  public RoomDto endTurn() {
+    Room room = getRoomForTurn();
 
     if (!room.getIsDiceRolled()) {
       throw new UserNotAllowedException("User must roll the dice before ending the turn.");
     }
 
-    delegateNextTurn(room);
-
-    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
-    convertAndSendTo(room.getReference(), roomDto, MessageType.END_TURN);
-
-    delegateTimer(room.getReference());
-
-    return roomDto;
+    return handleEndTurn(room, false);
   }
 
   @Override
+  @Transactional
   public void forceRollDice(UUID roomReference) {
     Room room =
         roomRepository
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
-    int firstRoll = random.nextInt(DICE_SIZE) + 1;
-    int secondRoll = random.nextInt(DICE_SIZE) + 1;
-
-    Member member = room.getMembers().get(room.getTurnIndex());
-    member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
-    memberRepository.save(member);
-
-    room.setIsDiceRolled(true);
-    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
-    roomDto.setExt(RoomExtraData.of(new DiceResult(firstRoll, secondRoll)));
-    convertAndSendTo(room.getReference(), roomDto, MessageType.FORCE_ROLL_DICE);
-
-    delegateTimer(room.getReference());
+    handleRollDice(room, true);
   }
 
   @Override
@@ -172,12 +130,40 @@ public class GameServiceImpl implements GameService {
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
+    handleEndTurn(room, true);
+  }
+
+  private RoomDto handleRollDice(Room room, boolean isForced) {
+    int firstRoll = random.nextInt(DICE_SIZE) + 1;
+    int secondRoll = random.nextInt(DICE_SIZE) + 1;
+
+    Member member = room.getMembers().get(room.getTurnIndex());
+    member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
+    memberRepository.save(member);
+
+    room.setIsDiceRolled(true);
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    roomDto.setExt(RoomExtraData.of(new DiceResult(firstRoll, secondRoll)));
+    convertAndSendTo(
+        room.getReference(),
+        roomDto,
+        isForced ? MessageType.FORCE_ROLL_DICE : MessageType.ROLL_DICE);
+
+    delegateTimer(room.getReference());
+
+    return roomDto;
+  }
+
+  private RoomDto handleEndTurn(Room room, boolean isForced) {
     delegateNextTurn(room);
 
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
-    convertAndSendTo(roomReference, roomDto, MessageType.FORCE_END_TURN);
+    convertAndSendTo(
+        room.getReference(), roomDto, isForced ? MessageType.FORCE_END_TURN : MessageType.END_TURN);
 
     delegateTimer(room.getReference());
+
+    return roomDto;
   }
 
   private void delegateNextTurn(Room room) {
@@ -226,6 +212,24 @@ public class GameServiceImpl implements GameService {
         availableCivilizations.remove(randomIndex);
       }
     }
+  }
+
+  private Room getRoomForTurn() {
+    Member member = getMemberFromAuthentication();
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
+    if (!room.getIsStarted()) {
+      throw new UserNotAllowedException("Game has not been started yet.");
+    }
+
+    if (!member.equalsById(room.getMembers().get(room.getTurnIndex()))) {
+      throw new UserNotAllowedException("It is not user's turn.");
+    }
+
+    return room;
   }
 
   private void convertAndSendTo(UUID roomReference, RoomDto memberDto, MessageType type) {

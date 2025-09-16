@@ -7,5 +7,7 @@ public interface UserService {
 
   UserDto getCurrentUser();
 
+  UserDto getUserByUsername(String username);
+
   UserDto updateAvatar(MultipartFile multipartFile);
 }

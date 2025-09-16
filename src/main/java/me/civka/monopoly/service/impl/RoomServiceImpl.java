@@ -108,12 +108,16 @@ public class RoomServiceImpl implements RoomService {
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("You cannot join a room that has already started");
+    }
     if (room.getMembers().size() >= room.getMemberLimit()) {
       throw new RoomIsFullException(room.getName());
     }
     if (room.getPassword() != null && !room.getPassword().equals(password)) {
       throw new InvalidRoomPasswordException(room.getName());
     }
+
     if (user.getMember() != null) {
       Room currentRoom =
           roomRepository
@@ -151,6 +155,10 @@ public class RoomServiceImpl implements RoomService {
             .getRoomByMembersContaining(user.getMember())
             .orElseThrow(() -> new RoomNotFoundException(user.getMember()));
 
+    //    if (room.getIsStarted()) {
+    //      throw new UserNotAllowedException("You cannot leave a room that has already started");
+    //    } TODO: return back on prod
+
     boolean isOwnerLeaving = room.isOwnedBy(user);
     unassignUserFromRoom(user, room);
 
@@ -184,6 +192,9 @@ public class RoomServiceImpl implements RoomService {
             .findById(memberReference)
             .orElseThrow(() -> new MemberNotFoundException(memberReference));
 
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("Cannot kick users from a room that has already started");
+    }
     if (!room.isOwnedBy(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }
@@ -219,6 +230,9 @@ public class RoomServiceImpl implements RoomService {
             .getRoomByMembersContaining(owner.getMember())
             .orElseThrow(() -> new RoomNotFoundException(owner.getMember()));
 
+    if (room.getIsStarted()) {
+      throw new UserNotAllowedException("Cannot delete a room that has already started");
+    }
     if (!room.isOwnedBy(owner)) {
       throw new UserNotAllowedException("Only room owner can kick users");
     }

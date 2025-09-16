@@ -43,12 +43,10 @@ public class AuthServiceImpl implements AuthService {
         authorityRepository
             .findByAuthority(AuthorityName.ROLE_USER)
             .orElseThrow(() -> new AuthorityNotFoundException(AuthorityName.ROLE_USER));
-    User user =
-        User.builder()
-            .username(userRequestDto.getUsername())
-            .password(passwordEncoder.encode(userRequestDto.getPassword()))
-            .authorities(Set.of(authority))
-            .build();
+    User user = new User();
+    user.setUsername(userRequestDto.getUsername());
+    user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
+    user.setAuthorities(Set.of(authority));
 
     userRepository.save(user);
 

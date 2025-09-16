@@ -11,6 +11,7 @@ import org.mapstruct.Named;
 public interface MemberMapper {
 
   @Mapping(target = "username", source = "user.username")
+  @Mapping(target = "avatarUrl", source = "user.avatarUrl")
   MemberDto toMemberDto(Member member);
 
   @Named("toMemberDto")

@@ -43,7 +43,7 @@ public class GameController {
     return gameService.getAllColors();
   }
 
-  @Operation(summary = "Start the properties")
+  @Operation(summary = "Start the game")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Game started successfully"),

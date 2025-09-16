@@ -19,6 +19,10 @@ public interface RoomMapper {
   @Mapping(target = "hasPassword", source = "password", qualifiedByName = "checkForPassword")
   RoomDto toRoomDto(Room room);
 
+  @Mapping(target = "members", ignore = true)
+  @Named("toRoomWithoutMembersDto")
+  RoomDto toRoomWithoutMembersDto(Room room);
+
   @Named("checkForPassword")
   default boolean checkForPassword(String password) {
     return password != null && !password.isEmpty();

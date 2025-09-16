@@ -53,12 +53,10 @@ public class GlobalGameScheduler {
 
         timer.setType(newType);
         games.put(timer, newType == TimerType.TURN ? TURN_TIMER_SECONDS : DICE_TIMER_SECONDS);
-        break;
+        return;
       }
     }
-  }
 
-  public static void createTimer(UUID roomReference) {
     games.put(new GameTimer(roomReference, TimerType.DICE), DICE_TIMER_SECONDS);
   }
 

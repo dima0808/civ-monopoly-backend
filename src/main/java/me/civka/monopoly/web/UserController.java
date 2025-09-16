@@ -9,6 +9,7 @@ import me.civka.monopoly.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +37,18 @@ public class UserController {
   @PreAuthorize("hasRole('USER')")
   public UserDto getCurrentUser() {
     return userService.getCurrentUser();
+  }
+
+  @Operation(summary = "Get user by username")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "User details retrieved"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+      })
+  @GetMapping("/{username}")
+  @ResponseStatus(HttpStatus.OK)
+  public UserDto getUserByUsername(@PathVariable String username) {
+    return userService.getUserByUsername(username);
   }
 
   @Operation(summary = "Update user avatar")

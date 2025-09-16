@@ -21,6 +21,7 @@ import me.civka.monopoly.service.exception.user.AuthorityNotFoundException;
 import me.civka.monopoly.service.exception.user.UserAlreadyExistsException;
 import me.civka.monopoly.service.exception.user.UserAlreadyInRoomException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
+import me.civka.monopoly.service.exception.user.UserNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotInRoomException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -77,6 +78,11 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
   public ResponseEntity<ProblemDetail> handleUsernameNotFoundException(
       UsernameNotFoundException ex) {
     return getErrorResponseEntity(NOT_FOUND, "Username Not Found", ex);
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleUserNotFoundException(UserNotFoundException ex) {
+    return getErrorResponseEntity(NOT_FOUND, "User Not Found", ex);
   }
 
   @ExceptionHandler(IllegalMemberLimitException.class)

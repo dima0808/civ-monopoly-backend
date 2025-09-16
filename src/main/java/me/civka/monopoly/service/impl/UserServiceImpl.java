@@ -11,6 +11,7 @@ import me.civka.monopoly.dto.user.UserDto;
 import me.civka.monopoly.repository.UserRepository;
 import me.civka.monopoly.repository.entity.User;
 import me.civka.monopoly.service.UserService;
+import me.civka.monopoly.service.exception.user.UserNotFoundException;
 import me.civka.monopoly.service.mapper.UserMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,15 @@ public class UserServiceImpl implements UserService {
   public UserDto getCurrentUser() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     return userMapper.toUserDto(user);
+  }
+
+  @Override
+  public UserDto getUserByUsername(String username) {
+    User user =
+        userRepository
+            .findWithRoomByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException(username));
+    return userMapper.toUserWithRoomDto(user);
   }
 
   @Override

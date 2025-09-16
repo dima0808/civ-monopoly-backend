@@ -7,5 +7,23 @@
     "MODERN": 70,
     "ATOMIC": 85,
     "INFORMATION": 100
-  }
+  },
+  "armySpending": [
+    {
+      "strength": -50,
+      "gold": 30
+    },
+    {
+      "strength": 10,
+      "gold": 0
+    },
+    {
+      "strength": 100,
+      "gold": -200
+    },
+    {
+      "strength": 200,
+      "gold": -700
+    }
+  ]
 }
