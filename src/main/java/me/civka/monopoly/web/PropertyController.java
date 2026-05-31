@@ -99,6 +99,21 @@ public class PropertyController {
     return propertyService.demoteUpgrade(demoteRequest);
   }
 
+  @Operation(summary = "Pay rent on foreign property")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Rent paid successfully"),
+        @ApiResponse(responseCode = "403", description = "Unable to pay rent (for any reason)")
+      })
+  @PostMapping("/pay-rent")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public PropertyDto payRent(
+      @Parameter(description = "Pay rent request", required = true) @RequestBody @Valid
+          PropertyRequestDto payRentRequest) {
+    return propertyService.payRent(payRentRequest);
+  }
+
   @Operation(summary = "Buyback mortgaged property")
   @ApiResponses(
       value = {

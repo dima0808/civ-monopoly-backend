@@ -50,6 +50,34 @@ public class PropertyUtils {
     return positions;
   }
 
+  public static int calculateGoldOnStep(Property property) {
+    if (property.getMortgage() != -1) {
+      return 0;
+    }
+    PropertyDetails propertyDetail = properties.get(property.getPosition());
+    int gos =
+        property.getUpgrades().stream().mapToInt(u -> propertyDetail.upgrades().get(u).gos()).sum();
+    gos +=
+        property.getBonuses().stream().mapToInt(b -> propertyDetail.bonuses().get(b).gos()).sum();
+    return gos;
+  }
+
+  public static int calculateTourismOnStep(Property property) {
+    if (property.getMortgage() != -1) {
+      return 0;
+    }
+    PropertyDetails propertyDetail = properties.get(property.getPosition());
+    int tourism =
+        property.getUpgrades().stream()
+            .mapToInt(u -> propertyDetail.upgrades().get(u).tourism())
+            .sum();
+    tourism +=
+        property.getBonuses().stream()
+            .mapToInt(b -> propertyDetail.bonuses().get(b).tourism())
+            .sum();
+    return tourism;
+  }
+
   public static int calculateGpt(List<Property> ownedProperties) {
     Map<Integer, PropertyDetails> properties =
         ConfigurationHolder.propertiesConfiguration().properties();

@@ -22,10 +22,12 @@ import me.civka.monopoly.message.GameMessage.MessageType;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
+import me.civka.monopoly.repository.entity.Event.EventType;
 import me.civka.monopoly.repository.entity.Member;
 import me.civka.monopoly.repository.entity.Member.Civilization;
 import me.civka.monopoly.repository.entity.Property;
 import me.civka.monopoly.repository.entity.Room;
+import me.civka.monopoly.service.EventService;
 import me.civka.monopoly.service.GameService;
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
@@ -38,6 +40,7 @@ import org.springframework.stereotype.Service;
 public class GameServiceImpl implements GameService {
 
   private static final int DICE_SIZE = 6;
+  private static final int MORTGAGE_PENALTY_VALUE = 5;
 
   private final RoomRepository roomRepository;
   private final RoomMapper roomMapper;
@@ -45,6 +48,7 @@ public class GameServiceImpl implements GameService {
   private final PropertyRepository propertyRepository;
   private final MemberRepository memberRepository;
   private final SimpMessagingTemplate messagingTemplate;
+  private final EventService eventService;
 
   @Override
   public CivilizationListDto getAllCivilizations() {
@@ -149,12 +153,24 @@ public class GameServiceImpl implements GameService {
         roomDto,
         isForced ? MessageType.FORCE_ROLL_DICE : MessageType.ROLL_DICE);
 
+    eventService.handleNewPosition(member, firstRoll, secondRoll);
+
     delegateTimer(room.getReference());
 
     return roomDto;
   }
 
   private RoomDto handleEndTurn(Room room, boolean isForced) {
+    Member member = room.getMembers().get(room.getTurnIndex());
+
+    if (!isForced) {
+      if (!member.getEvents().isEmpty()) {
+        throw new UserNotAllowedException("Must resolve all events before ending turn.");
+      }
+    } else {
+      handleForceEndTurnPenalties(member);
+    }
+
     delegateNextTurn(room);
 
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
@@ -164,6 +180,27 @@ public class GameServiceImpl implements GameService {
     delegateTimer(room.getReference());
 
     return roomDto;
+  }
+
+  private void handleForceEndTurnPenalties(Member member) {
+    if (member.getEvents().isEmpty()) {
+      return;
+    }
+
+    boolean hasForeignProperty =
+        member.getEvents().stream()
+            .anyMatch(event -> event.getType() == EventType.FOREIGN_PROPERTY);
+
+    if (hasForeignProperty) {
+      member.setGold(0);
+      member.setStrength(0);
+
+      List<Property> properties = propertyRepository.getPropertiesByMember(member);
+      properties.forEach(property -> property.setMortgage(MORTGAGE_PENALTY_VALUE));
+      propertyRepository.saveAll(properties);
+    }
+
+    eventService.deleteAllEvents(member);
   }
 
   private void delegateNextTurn(Room room) {

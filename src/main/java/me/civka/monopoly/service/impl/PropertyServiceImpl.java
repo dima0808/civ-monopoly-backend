@@ -5,19 +5,24 @@ import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.common.PropertyType;
 import me.civka.monopoly.common.Requirement;
 import me.civka.monopoly.config.ConfigurationHolder;
 import me.civka.monopoly.config.properties.PropertiesConfiguration;
+import me.civka.monopoly.config.properties.PropertyDetails;
 import me.civka.monopoly.dto.property.PropertyDto;
 import me.civka.monopoly.dto.property.PropertyRequestDto;
 import me.civka.monopoly.dto.property.UpgradePropertyRequestDto;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
+import me.civka.monopoly.repository.entity.Event;
+import me.civka.monopoly.repository.entity.Event.EventType;
 import me.civka.monopoly.repository.entity.Member;
 import me.civka.monopoly.repository.entity.Property;
 import me.civka.monopoly.repository.entity.Property.UpgradeType;
 import me.civka.monopoly.repository.entity.Room;
+import me.civka.monopoly.service.EventService;
 import me.civka.monopoly.service.PropertyService;
 import me.civka.monopoly.service.exception.property.PropertyNotFoundException;
 import me.civka.monopoly.service.exception.property.RequirementNotFulfilledException;
@@ -25,6 +30,7 @@ import me.civka.monopoly.service.exception.property.UpgradeAlreadyExistsExceptio
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
 import me.civka.monopoly.service.mapper.PropertyMapper;
+import me.civka.monopoly.util.PropertyUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,6 +46,7 @@ public class PropertyServiceImpl implements PropertyService {
   private final RoomRepository roomRepository;
   private final PropertyMapper propertyMapper;
   private final MemberRepository memberRepository;
+  private final EventService eventService;
 
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
@@ -51,6 +58,10 @@ public class PropertyServiceImpl implements PropertyService {
 
     if (member.getPosition() != position) {
       throw new UserNotAllowedException("User is not on the property position.");
+    }
+
+    if (eventService.findByMemberAndType(member, EventType.BUY_PROPERTY) == null) {
+      throw new UserNotAllowedException("No BUY_PROPERTY event for this member.");
     }
 
     int price = checkForPrice(member, position, UpgradeType.LEVEL_1);
@@ -78,7 +89,9 @@ public class PropertyServiceImpl implements PropertyService {
             .room(room)
             .build();
 
-    return propertyMapper.toPropertyDto(propertyRepository.save(property));
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    eventService.deleteEvent(member, EventType.BUY_PROPERTY);
+    return propertyDto;
   }
 
   @Override
@@ -203,6 +216,58 @@ public class PropertyServiceImpl implements PropertyService {
 
     memberRepository.save(member);
     return propertyMapper.toPropertyDto(propertyRepository.save(property));
+  }
+
+  @Override
+  public PropertyDto payRent(PropertyRequestDto payRentRequest) {
+    Member member = getMemberFromAuthentication();
+    int position = payRentRequest.getPosition();
+
+    if (member.getPosition() != position) {
+      throw new UserNotAllowedException("User is not on the property position.");
+    }
+
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
+    Property property =
+        propertyRepository
+            .getPropertyByPositionAndRoom(position, room)
+            .orElseThrow(() -> new PropertyNotFoundException(position, member));
+
+    if (property.getMember().equalsById(member)) {
+      throw new UserNotAllowedException("Cannot pay rent on own property.");
+    }
+
+    Event event = eventService.findByMemberAndType(member, EventType.FOREIGN_PROPERTY);
+    if (event == null) {
+      throw new UserNotAllowedException("No FOREIGN_PROPERTY event for this member.");
+    }
+
+    int rent = PropertyUtils.calculateGoldOnStep(property);
+
+    PropertyDetails propertyDetails = propertiesConfiguration.properties().get(position);
+    if (propertyDetails.type() == PropertyType.DISTRICT_ENCAMPMENT) {
+      rent = rent * event.getExt().getRoll();
+    }
+
+    if (member.getGold() < rent) {
+      throw new UserNotAllowedException("User does not have enough gold to pay rent.");
+    }
+
+    member.setGold(member.getGold() - rent);
+
+    Member owner = property.getMember();
+    owner.setGold(owner.getGold() + rent);
+
+    memberRepository.save(member);
+    memberRepository.save(owner);
+
+    eventService.deleteEvent(member, EventType.FOREIGN_PROPERTY);
+
+    return propertyMapper.toPropertyDto(property);
   }
 
   private int checkForPrice(Member member, int position, UpgradeType upgradeType) {

@@ -17,4 +17,6 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
   List<Property> getPropertiesByMember(Member member);
 
   Optional<Property> getPropertyByPositionAndMember(int position, Member member);
+
+  Optional<Property> getPropertyByPositionAndRoom(int position, Room room);
 }

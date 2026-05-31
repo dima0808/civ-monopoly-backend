@@ -15,4 +15,6 @@ public interface PropertyService {
   PropertyDto demoteUpgrade(PropertyRequestDto demoteRequest);
 
   PropertyDto buybackProperty(PropertyRequestDto buybackRequest);
+
+  PropertyDto payRent(PropertyRequestDto payRentRequest);
 }

@@ -41,15 +41,25 @@ public class Event {
   private Member member;
 
   public enum EventType {
-    BUY_PROPERTY,
-    FOREIGN_PROPERTY,
-    ENEMY_PROPERTY,
-    GOODY_HUT,
-    BARBARIANS,
-    PROJECTS_EDGE,
-    PROJECTS_SCIENCE,
-    PROJECTS_CULTURE,
-    ALLIANCE,
-    PEACE,
+    BUY_PROPERTY(true),
+    FOREIGN_PROPERTY(false),
+    ENEMY_PROPERTY(false),
+    GOODY_HUT(false),
+    BARBARIANS(false),
+    PROJECTS_EDGE(true),
+    PROJECTS_SCIENCE(true),
+    PROJECTS_CULTURE(true),
+    ALLIANCE(false),
+    PEACE(false);
+
+    private final boolean skippable;
+
+    EventType(boolean skippable) {
+      this.skippable = skippable;
+    }
+
+    public boolean isSkippable() {
+      return skippable;
+    }
   }
 }
