@@ -187,18 +187,18 @@ public class GameServiceImpl implements GameService {
       return;
     }
 
-    boolean hasForeignProperty =
-        member.getEvents().stream()
-            .anyMatch(event -> event.getType() == EventType.FOREIGN_PROPERTY);
-
-    if (hasForeignProperty) {
-      member.setGold(0);
-      member.setStrength(0);
-
-      List<Property> properties = propertyRepository.getPropertiesByMember(member);
-      properties.forEach(property -> property.setMortgage(MORTGAGE_PENALTY_VALUE));
-      propertyRepository.saveAll(properties);
-    }
+//    boolean hasForeignProperty =
+//        member.getEvents().stream()
+//            .anyMatch(event -> event.getType() == EventType.FOREIGN_PROPERTY);
+//
+//    if (hasForeignProperty) {
+//      member.setGold(0);
+//      member.setStrength(0);
+//
+//      List<Property> properties = propertyRepository.getPropertiesByMember(member);
+//      properties.forEach(property -> property.setMortgage(MORTGAGE_PENALTY_VALUE));
+//      propertyRepository.saveAll(properties);
+//    }
 
     eventService.deleteAllEvents(member);
   }

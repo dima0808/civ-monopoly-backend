@@ -69,7 +69,7 @@ public class EventServiceImpl implements EventService {
     }
 
     Property property = propertyAtPosition.get();
-    if (!property.getMember().equalsById(member)) {
+    if (!property.getMember().equalsById(member) && property.getMortgage() == -1) {
       if (propertyDetails.type() == PropertyType.DISTRICT_ENCAMPMENT) {
         addEvent(member, EventType.FOREIGN_PROPERTY, firstRoll + secondRoll);
       } else {
