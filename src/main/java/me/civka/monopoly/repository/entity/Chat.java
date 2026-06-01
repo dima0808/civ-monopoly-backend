@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -25,7 +26,11 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "chats")
+@Table(
+    name = "chats",
+    indexes = {
+      @Index(name = "idx_chat_room", columnList = "room_reference"),
+    })
 public class Chat {
 
   @Id private UUID reference;

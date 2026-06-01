@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
@@ -22,7 +23,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "messages")
+@Table(
+    name = "messages",
+    indexes = {
+      @Index(name = "idx_message_chat_timestamp", columnList = "chat_reference, time_stamp DESC"),
+      @Index(name = "idx_message_chat_ref", columnList = "chat_reference, reference"),
+    })
 public class Message {
 
   @Id

@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -25,7 +26,14 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "properties")
+@Table(
+    name = "properties",
+    indexes = {
+      @Index(name = "idx_property_room", columnList = "room_reference"),
+      @Index(name = "idx_property_member", columnList = "member_reference"),
+      @Index(name = "idx_property_position_room", columnList = "position, room_reference"),
+      @Index(name = "idx_property_position_member", columnList = "position, member_reference"),
+    })
 public class Property {
 
   @Id

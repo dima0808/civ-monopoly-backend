@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Setter
@@ -24,7 +26,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "events")
+@Table(
+    name = "events",
+    indexes = {
+      @Index(name = "idx_event_member_type", columnList = "member_reference, type"),
+    })
 public class Event {
 
   @Id
@@ -40,6 +46,8 @@ public class Event {
   @ManyToOne(fetch = FetchType.EAGER)
   private Member member;
 
+  @Getter
+  @RequiredArgsConstructor
   public enum EventType {
     BUY_PROPERTY(true),
     FOREIGN_PROPERTY(false),
@@ -53,13 +61,5 @@ public class Event {
     PEACE(false);
 
     private final boolean skippable;
-
-    EventType(boolean skippable) {
-      this.skippable = skippable;
-    }
-
-    public boolean isSkippable() {
-      return skippable;
-    }
   }
 }
