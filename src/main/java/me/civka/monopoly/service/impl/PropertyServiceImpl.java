@@ -4,15 +4,18 @@ import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.PropertyType;
 import me.civka.monopoly.common.Requirement;
 import me.civka.monopoly.config.ConfigurationHolder;
 import me.civka.monopoly.config.properties.PropertiesConfiguration;
 import me.civka.monopoly.config.properties.PropertyDetails;
+import me.civka.monopoly.dto.member.MemberDto;
 import me.civka.monopoly.dto.property.PropertyDto;
 import me.civka.monopoly.dto.property.PropertyRequestDto;
 import me.civka.monopoly.dto.property.UpgradePropertyRequestDto;
+import me.civka.monopoly.message.PropertyMessage;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
@@ -29,8 +32,10 @@ import me.civka.monopoly.service.exception.property.RequirementNotFulfilledExcep
 import me.civka.monopoly.service.exception.property.UpgradeAlreadyExistsException;
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
+import me.civka.monopoly.service.mapper.MemberMapper;
 import me.civka.monopoly.service.mapper.PropertyMapper;
 import me.civka.monopoly.util.PropertyUtils;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,11 +50,25 @@ public class PropertyServiceImpl implements PropertyService {
   private final PropertyRepository propertyRepository;
   private final RoomRepository roomRepository;
   private final PropertyMapper propertyMapper;
+  private final MemberMapper memberMapper;
   private final MemberRepository memberRepository;
   private final EventService eventService;
+  private final SimpMessagingTemplate messagingTemplate;
 
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
+
+  @Override
+  public List<PropertyDto> getPropertiesByRoom(UUID roomReference) {
+    Room room =
+        roomRepository
+            .findById(roomReference)
+            .orElseThrow(() -> new RoomNotFoundException(roomReference));
+
+    return propertyRepository.getPropertiesByRoom(room).stream()
+        .map(propertyMapper::toPropertyDto)
+        .toList();
+  }
 
   @Override
   public PropertyDto buyProperty(PropertyRequestDto buyRequest) {
@@ -91,6 +110,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
     eventService.deleteEvent(member, EventType.BUY_PROPERTY);
+    sendPropertyMessage(
+        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_BUY);
     return propertyDto;
   }
 
@@ -129,7 +150,10 @@ public class PropertyServiceImpl implements PropertyService {
     property.getUpgrades().add(upgradeType);
 
     memberRepository.save(member);
-    return propertyMapper.toPropertyDto(propertyRepository.save(property));
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    sendPropertyMessage(
+        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_UPGRADE);
+    return propertyDto;
   }
 
   @Override
@@ -156,7 +180,13 @@ public class PropertyServiceImpl implements PropertyService {
     property.setMortgage(MORTGAGE_START_VALUE);
 
     memberRepository.save(member);
-    return propertyMapper.toPropertyDto(propertyRepository.save(property));
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    sendPropertyMessage(
+        property.getRoom(),
+        propertyDto,
+        List.of(member),
+        PropertyMessage.MessageType.PROPERTY_MORTGAGE);
+    return propertyDto;
   }
 
   @Override
@@ -180,7 +210,13 @@ public class PropertyServiceImpl implements PropertyService {
     property.getUpgrades().remove(lastUpgrade);
 
     memberRepository.save(member);
-    return propertyMapper.toPropertyDto(propertyRepository.save(property));
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    sendPropertyMessage(
+        property.getRoom(),
+        propertyDto,
+        List.of(member),
+        PropertyMessage.MessageType.PROPERTY_DEMOTE);
+    return propertyDto;
   }
 
   @Override
@@ -215,7 +251,13 @@ public class PropertyServiceImpl implements PropertyService {
     property.setMortgage(-1);
 
     memberRepository.save(member);
-    return propertyMapper.toPropertyDto(propertyRepository.save(property));
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    sendPropertyMessage(
+        property.getRoom(),
+        propertyDto,
+        List.of(member),
+        PropertyMessage.MessageType.PROPERTY_BUYBACK);
+    return propertyDto;
   }
 
   @Override
@@ -267,7 +309,20 @@ public class PropertyServiceImpl implements PropertyService {
 
     eventService.deleteEvent(member, EventType.FOREIGN_PROPERTY);
 
-    return propertyMapper.toPropertyDto(property);
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
+    sendPropertyMessage(
+        room, propertyDto, List.of(member, owner), PropertyMessage.MessageType.RENT_PAY);
+    return propertyDto;
+  }
+
+  private void sendPropertyMessage(
+      Room room,
+      PropertyDto propertyDto,
+      List<Member> affectedMembers,
+      PropertyMessage.MessageType type) {
+    List<MemberDto> memberDtos = affectedMembers.stream().map(memberMapper::toMemberDto).toList();
+    messagingTemplate.convertAndSend(
+        "/topic/games/" + room.getReference(), PropertyMessage.of(propertyDto, memberDtos, type));
   }
 
   private int checkForPrice(Member member, int position, UpgradeType upgradeType) {

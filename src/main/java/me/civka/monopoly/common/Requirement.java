@@ -225,7 +225,8 @@ public enum Requirement implements RequirementService {
   OWN_NO_GOVERNMENT_PLAZA {
     @Override
     public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
-      return super.isBuyAllowed(member, room, ownedProperties);
+      List<Integer> govPlazaPos = getPositionByName(GOVERNMENT_PLAZA_PROPERTY_NAME);
+      return ownedProperties.stream().noneMatch(p -> govPlazaPos.contains(p.getPosition()));
     }
   },
 

@@ -1,10 +1,14 @@
 package me.civka.monopoly.service;
 
+import java.util.List;
+import me.civka.monopoly.dto.event.EventDto;
 import me.civka.monopoly.repository.entity.Event;
 import me.civka.monopoly.repository.entity.Event.EventType;
 import me.civka.monopoly.repository.entity.Member;
 
 public interface EventService {
+
+  List<EventDto> getMyEvents();
 
   void handleNewPosition(Member member, int firstRoll, int secondRoll);
 

@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.dto.event.EventDto;
 import me.civka.monopoly.repository.entity.Event.EventType;
 import me.civka.monopoly.service.EventService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 
   private final EventService eventService;
+
+  @Operation(summary = "Get current user's events")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "Events retrieved successfully")})
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public List<EventDto> getMyEvents() {
+    return eventService.getMyEvents();
+  }
 
   @Operation(summary = "Skip an event")
   @ApiResponses(

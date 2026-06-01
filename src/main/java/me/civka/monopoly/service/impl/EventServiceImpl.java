@@ -1,6 +1,9 @@
 package me.civka.monopoly.service.impl;
 
+import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
+
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.PropertyType;
@@ -40,6 +43,12 @@ public class EventServiceImpl implements EventService {
 
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
+
+  @Override
+  public List<EventDto> getMyEvents() {
+    Member member = getMemberFromAuthentication();
+    return member.getEvents().stream().map(eventMapper::toEventDto).toList();
+  }
 
   @Override
   public void handleNewPosition(Member member, int firstRoll, int secondRoll) {

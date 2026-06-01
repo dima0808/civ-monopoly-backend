@@ -221,7 +221,9 @@ public class GameServiceImpl implements GameService {
   private void checkForMortgage(Room room) {
     List<Property> properties = propertyRepository.getPropertiesByRoom(room);
 
-    properties.forEach(property -> property.setMortgage(property.getMortgage() - 1));
+    properties.stream()
+        .filter(property -> property.getMortgage() != -1)
+        .forEach(property -> property.setMortgage(property.getMortgage() - 1));
     propertyRepository.saveAll(properties);
 
     propertyRepository.deleteAllById(
