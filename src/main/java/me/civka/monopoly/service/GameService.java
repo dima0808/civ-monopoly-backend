@@ -15,7 +15,7 @@ public interface GameService {
 
   RoomDto rollDice();
 
-  RoomDto endTurn();
+  RoomDto endTurn(int armySpendingIndex);
 
   void forceRollDice(UUID roomReference);
 

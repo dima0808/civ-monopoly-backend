@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.config.ConfigurationHolder;
+import me.civka.monopoly.config.game.ArmySpending;
 import me.civka.monopoly.config.game.GameConfiguration;
 import me.civka.monopoly.dto.game.CivilizationListDto;
 import me.civka.monopoly.dto.game.ColorListDto;
@@ -42,7 +43,7 @@ import org.springframework.stereotype.Service;
 public class GameServiceImpl implements GameService {
 
   private static final int DICE_SIZE = 6;
-  private static final int MORTGAGE_PENALTY_VALUE = 5;
+  private static final int DEFAULT_ARMY_SPENDING_INDEX = 1;
 
   private final RoomRepository roomRepository;
   private final RoomMapper roomMapper;
@@ -109,14 +110,14 @@ public class GameServiceImpl implements GameService {
 
   @Override
   @Transactional
-  public RoomDto endTurn() {
+  public RoomDto endTurn(int armySpendingIndex) {
     Room room = getRoomForTurn();
 
     if (!room.getIsDiceRolled()) {
       throw new UserNotAllowedException("User must roll the dice before ending the turn.");
     }
 
-    return handleEndTurn(room, false);
+    return handleEndTurn(room, false, armySpendingIndex);
   }
 
   @Override
@@ -138,7 +139,7 @@ public class GameServiceImpl implements GameService {
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
-    handleEndTurn(room, true);
+    handleEndTurn(room, true, DEFAULT_ARMY_SPENDING_INDEX);
   }
 
   private RoomDto handleRollDice(Room room, boolean isForced) {
@@ -174,7 +175,7 @@ public class GameServiceImpl implements GameService {
     return roomDto;
   }
 
-  private RoomDto handleEndTurn(Room room, boolean isForced) {
+  private RoomDto handleEndTurn(Room room, boolean isForced, int armySpendingIndex) {
     Member member = room.getMembers().get(room.getTurnIndex());
 
     if (!isForced) {
@@ -185,6 +186,8 @@ public class GameServiceImpl implements GameService {
       handleForceEndTurnPenalties(member);
     }
 
+    applyArmySpending(member, armySpendingIndex);
+
     delegateNextTurn(room);
 
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
@@ -194,6 +197,17 @@ public class GameServiceImpl implements GameService {
     delegateTimer(room.getReference());
 
     return roomDto;
+  }
+
+  private void applyArmySpending(Member member, int armySpendingIndex) {
+    List<ArmySpending> spending = gameConfiguration.armySpending();
+    if (armySpendingIndex < 0 || armySpendingIndex >= spending.size()) {
+      throw new UserNotAllowedException("Invalid army spending index.");
+    }
+    ArmySpending selected = spending.get(armySpendingIndex);
+    member.setGold(member.getGold() + selected.gold());
+    member.setStrength(member.getStrength() + selected.strength());
+    memberRepository.save(member);
   }
 
   private void handleForceEndTurnPenalties(Member member) {

@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,7 +81,7 @@ public class GameController {
   @PostMapping("/end-turn")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('USER')")
-  public RoomDto endTurn() {
-    return gameService.endTurn();
+  public RoomDto endTurn(@RequestParam int armySpendingIndex) {
+    return gameService.endTurn(armySpendingIndex);
   }
 }
