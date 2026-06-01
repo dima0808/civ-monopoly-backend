@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.dto.property.PropertyDto;
 import me.civka.monopoly.dto.property.PropertyRequestDto;
+import me.civka.monopoly.dto.property.PropertyRequirementsDto;
 import me.civka.monopoly.dto.property.UpgradePropertyRequestDto;
 import me.civka.monopoly.service.PropertyService;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class PropertyController {
 
   private final PropertyService propertyService;
+
+  @Operation(summary = "Get requirements for available properties")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Requirements retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Room not found")
+      })
+  @GetMapping("/requirements")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public Map<Integer, PropertyRequirementsDto> getRequirements() {
+    return propertyService.getRequirements();
+  }
 
   @Operation(summary = "Get all properties in a room")
   @ApiResponses(

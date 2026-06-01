@@ -51,7 +51,7 @@ public enum Requirement implements RequirementService {
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
-      return propertyToUpgrade.getTurnOfLastChange() - room.getTurn() >= 1;
+      return room.getTurn() - propertyToUpgrade.getTurnOfLastChange() >= 1;
     }
   },
 
@@ -59,7 +59,7 @@ public enum Requirement implements RequirementService {
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
-      return propertyToUpgrade.getTurnOfLastChange() - room.getTurn() >= 2;
+      return room.getTurn() - propertyToUpgrade.getTurnOfLastChange() >= 2;
     }
   },
 
@@ -67,7 +67,7 @@ public enum Requirement implements RequirementService {
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
-      return propertyToUpgrade.getTurnOfLastChange() - room.getTurn() >= 3;
+      return room.getTurn() - propertyToUpgrade.getTurnOfLastChange() >= 3;
     }
   },
 
@@ -75,7 +75,7 @@ public enum Requirement implements RequirementService {
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
-      return propertyToUpgrade.getTurnOfLastChange() - room.getTurn() >= 4;
+      return room.getTurn() - propertyToUpgrade.getTurnOfLastChange() >= 4;
     }
   },
 
@@ -379,6 +379,11 @@ public enum Requirement implements RequirementService {
 
   ON_CLASSICAL_ERA {
     @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.CLASSICAL);
+    }
+
+    @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
       return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.CLASSICAL);
@@ -386,6 +391,11 @@ public enum Requirement implements RequirementService {
   },
 
   ON_MEDIEVAL_ERA {
+    @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.MEDIEVAL);
+    }
+
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
@@ -395,6 +405,11 @@ public enum Requirement implements RequirementService {
 
   ON_RENAISSANCE_ERA {
     @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.RENAISSANCE);
+    }
+
+    @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
       return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.RENAISSANCE);
@@ -402,6 +417,11 @@ public enum Requirement implements RequirementService {
   },
 
   ON_INDUSTRIAL_ERA {
+    @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.RENAISSANCE);
+    }
+
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
@@ -411,6 +431,11 @@ public enum Requirement implements RequirementService {
 
   ON_MODERN_ERA {
     @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.RENAISSANCE);
+    }
+
+    @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
       return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.MODERN);
@@ -418,6 +443,11 @@ public enum Requirement implements RequirementService {
   },
 
   ON_ATOMIC_ERA {
+    @Override
+    public boolean isBuyAllowed(Member member, Room room, List<Property> ownedProperties) {
+      return room.getTurn() >= ConfigurationHolder.gameConfiguration().eras().get(Era.RENAISSANCE);
+    }
+
     @Override
     public boolean isUpgradeAllowed(
         Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {

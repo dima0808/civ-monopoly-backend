@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.config.ConfigurationHolder;
+import me.civka.monopoly.config.game.GameConfiguration;
 import me.civka.monopoly.dto.game.CivilizationListDto;
 import me.civka.monopoly.dto.game.ColorListDto;
 import me.civka.monopoly.dto.room.RoomDto;
@@ -22,7 +24,6 @@ import me.civka.monopoly.message.GameMessage.MessageType;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
-import me.civka.monopoly.repository.entity.Event.EventType;
 import me.civka.monopoly.repository.entity.Member;
 import me.civka.monopoly.repository.entity.Member.Civilization;
 import me.civka.monopoly.repository.entity.Property;
@@ -32,6 +33,7 @@ import me.civka.monopoly.service.GameService;
 import me.civka.monopoly.service.exception.room.RoomNotFoundException;
 import me.civka.monopoly.service.exception.user.UserNotAllowedException;
 import me.civka.monopoly.service.mapper.RoomMapper;
+import me.civka.monopoly.util.PropertyUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,8 @@ public class GameServiceImpl implements GameService {
   private final MemberRepository memberRepository;
   private final SimpMessagingTemplate messagingTemplate;
   private final EventService eventService;
+
+  private final GameConfiguration gameConfiguration = ConfigurationHolder.gameConfiguration();
 
   @Override
   public CivilizationListDto getAllCivilizations() {
@@ -142,7 +146,17 @@ public class GameServiceImpl implements GameService {
     int secondRoll = random.nextInt(DICE_SIZE) + 1;
 
     Member member = room.getMembers().get(room.getTurnIndex());
-    member.setPosition((member.getPosition() + firstRoll + secondRoll) % BOARD_SIZE);
+    int newPosition = member.getPosition() + firstRoll + secondRoll;
+    if (newPosition >= BOARD_SIZE) {
+      member.setRoundsMade(member.getRoundsMade() + 1);
+      member.setGold(member.getGold() + gameConfiguration.goldForPassingRound());
+    }
+    member.setPosition(newPosition % BOARD_SIZE);
+
+    List<Property> ownedProperties = propertyRepository.getPropertiesByMember(member);
+    int gpt = PropertyUtils.calculateGpt(ownedProperties);
+    member.setGold(member.getGold() + gpt);
+
     memberRepository.save(member);
 
     room.setIsDiceRolled(true);
@@ -187,18 +201,18 @@ public class GameServiceImpl implements GameService {
       return;
     }
 
-//    boolean hasForeignProperty =
-//        member.getEvents().stream()
-//            .anyMatch(event -> event.getType() == EventType.FOREIGN_PROPERTY);
-//
-//    if (hasForeignProperty) {
-//      member.setGold(0);
-//      member.setStrength(0);
-//
-//      List<Property> properties = propertyRepository.getPropertiesByMember(member);
-//      properties.forEach(property -> property.setMortgage(MORTGAGE_PENALTY_VALUE));
-//      propertyRepository.saveAll(properties);
-//    }
+    //    boolean hasForeignProperty =
+    //        member.getEvents().stream()
+    //            .anyMatch(event -> event.getType() == EventType.FOREIGN_PROPERTY);
+    //
+    //    if (hasForeignProperty) {
+    //      member.setGold(0);
+    //      member.setStrength(0);
+    //
+    //      List<Property> properties = propertyRepository.getPropertiesByMember(member);
+    //      properties.forEach(property -> property.setMortgage(MORTGAGE_PENALTY_VALUE));
+    //      propertyRepository.saveAll(properties);
+    //    }
 
     eventService.deleteAllEvents(member);
   }
@@ -208,6 +222,7 @@ public class GameServiceImpl implements GameService {
       room.setTurnIndex((room.getTurnIndex() + 1) % room.getMembers().size());
       if (room.getTurnIndex().equals(room.getState().getFirstTurnIndex())) {
         room.setTurn(room.getTurn() + 1);
+        convertAndSendTo(room.getReference(), roomMapper.toRoomDto(room), MessageType.NEW_TURN);
         checkForMortgage(room);
       }
     } else {

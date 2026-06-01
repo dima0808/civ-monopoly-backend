@@ -4,4 +4,5 @@ import java.util.List;
 import java.util.Map;
 import me.civka.monopoly.common.Era;
 
-public record GameConfiguration(Map<Era, Integer> eras, List<ArmySpending> armySpending) {}
+public record GameConfiguration(
+    Integer goldForPassingRound, Map<Era, Integer> eras, List<ArmySpending> armySpending) {}

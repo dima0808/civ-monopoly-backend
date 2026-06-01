@@ -47,7 +47,7 @@ public class RoomServiceImpl implements RoomService {
   private static final int MAX_MEMBER_LIMIT = 6;
 
   private static final int GOLD_START_VALUE = 5000;
-  private static final int STRENGTH_START_VALUE = 0;
+  private static final int STRENGTH_START_VALUE = 40;
   private static final int TOURISM_START_VALUE = 0;
   private static final int SCORE_START_VALUE = 0;
 

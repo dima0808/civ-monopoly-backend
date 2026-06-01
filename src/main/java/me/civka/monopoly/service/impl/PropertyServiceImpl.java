@@ -3,7 +3,9 @@ package me.civka.monopoly.service.impl;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
 import jakarta.transaction.Transactional;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.PropertyType;
@@ -11,9 +13,11 @@ import me.civka.monopoly.common.Requirement;
 import me.civka.monopoly.config.ConfigurationHolder;
 import me.civka.monopoly.config.properties.PropertiesConfiguration;
 import me.civka.monopoly.config.properties.PropertyDetails;
+import me.civka.monopoly.config.properties.Upgrade;
 import me.civka.monopoly.dto.member.MemberDto;
 import me.civka.monopoly.dto.property.PropertyDto;
 import me.civka.monopoly.dto.property.PropertyRequestDto;
+import me.civka.monopoly.dto.property.PropertyRequirementsDto;
 import me.civka.monopoly.dto.property.UpgradePropertyRequestDto;
 import me.civka.monopoly.message.PropertyMessage;
 import me.civka.monopoly.repository.MemberRepository;
@@ -57,6 +61,76 @@ public class PropertyServiceImpl implements PropertyService {
 
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
+
+  @Override
+  public Map<Integer, PropertyRequirementsDto> getRequirements() {
+    Member member = getMemberFromAuthentication();
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
+    List<Property> allProperties = propertyRepository.getPropertiesByRoom(room);
+    List<Property> ownedProperties = propertyRepository.getPropertiesByMember(member);
+
+    Map<Integer, PropertyRequirementsDto> result = new LinkedHashMap<>();
+
+    for (Map.Entry<Integer, PropertyDetails> entry :
+        propertiesConfiguration.properties().entrySet()) {
+      int position = entry.getKey();
+      PropertyDetails details = entry.getValue();
+
+      Property existing =
+          allProperties.stream().filter(p -> p.getPosition() == position).findFirst().orElse(null);
+
+      if (existing != null && !existing.getMember().equalsById(member)) {
+        continue;
+      }
+
+      UpgradeType nextUpgrade;
+      Map<String, Boolean> requirementResults = new LinkedHashMap<>();
+
+      if (existing == null) {
+        nextUpgrade = UpgradeType.LEVEL_1;
+        Upgrade upgrade = details.upgrades().get(UpgradeType.LEVEL_1);
+        if (upgrade != null && upgrade.requirements() != null) {
+          for (Requirement req : upgrade.requirements()) {
+            requirementResults.put(req.name(), req.isBuyAllowed(member, room, ownedProperties));
+          }
+        }
+      } else {
+        UpgradeType highestOwned =
+            existing.getUpgrades().stream().max(Enum::compareTo).orElse(UpgradeType.LEVEL_1);
+        nextUpgrade = getNextUpgrade(highestOwned);
+        if (nextUpgrade == null) {
+          continue;
+        }
+        Upgrade upgrade = details.upgrades().get(nextUpgrade);
+        if (upgrade == null) {
+          continue;
+        }
+        if (upgrade.requirements() != null) {
+          for (Requirement req : upgrade.requirements()) {
+            requirementResults.put(
+                req.name(), req.isUpgradeAllowed(existing, member, room, ownedProperties));
+          }
+        }
+      }
+
+      result.put(position, new PropertyRequirementsDto(nextUpgrade.name(), requirementResults));
+    }
+
+    return result;
+  }
+
+  private UpgradeType getNextUpgrade(UpgradeType current) {
+    UpgradeType[] values = UpgradeType.values();
+    int nextOrdinal = current.ordinal() + 1;
+    if (nextOrdinal >= values.length) {
+      return null;
+    }
+    return values[nextOrdinal];
+  }
 
   @Override
   public List<PropertyDto> getPropertiesByRoom(UUID roomReference) {
@@ -148,6 +222,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     member.setGold(member.getGold() - price);
     property.getUpgrades().add(upgradeType);
+    property.setTurnOfLastChange(room.getTurn());
+    property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
     PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
@@ -176,16 +252,20 @@ public class PropertyServiceImpl implements PropertyService {
             .upgrades()
             .get(UpgradeType.LEVEL_1)
             .price();
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
     member.setGold(member.getGold() + (int) (price * MORTGAGE_RETURN_RATE));
     property.setMortgage(MORTGAGE_START_VALUE);
+    property.setTurnOfLastChange(room.getTurn());
+    property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
     PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
     sendPropertyMessage(
-        property.getRoom(),
-        propertyDto,
-        List.of(member),
-        PropertyMessage.MessageType.PROPERTY_MORTGAGE);
+        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_MORTGAGE);
     return propertyDto;
   }
 
@@ -206,16 +286,20 @@ public class PropertyServiceImpl implements PropertyService {
 
     int price =
         propertiesConfiguration.properties().get(position).upgrades().get(lastUpgrade).price();
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
     member.setGold(member.getGold() + price);
     property.getUpgrades().remove(lastUpgrade);
+    property.setTurnOfLastChange(room.getTurn());
+    property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
     PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
     sendPropertyMessage(
-        property.getRoom(),
-        propertyDto,
-        List.of(member),
-        PropertyMessage.MessageType.PROPERTY_DEMOTE);
+        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_DEMOTE);
     return propertyDto;
   }
 
@@ -247,16 +331,20 @@ public class PropertyServiceImpl implements PropertyService {
 
     checkForCurrentTurn(member);
 
+    Room room =
+        roomRepository
+            .getRoomByMembersContaining(member)
+            .orElseThrow(() -> new RoomNotFoundException(member));
+
     member.setGold(member.getGold() - buybackPrice);
     property.setMortgage(-1);
+    property.setTurnOfLastChange(room.getTurn());
+    property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
     PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
     sendPropertyMessage(
-        property.getRoom(),
-        propertyDto,
-        List.of(member),
-        PropertyMessage.MessageType.PROPERTY_BUYBACK);
+        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_BUYBACK);
     return propertyDto;
   }
 

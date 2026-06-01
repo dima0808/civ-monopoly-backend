@@ -1,4 +1,5 @@
 {
+  "goldForPassingRound": 500,
   "eras": {
     "CLASSICAL": 10,
     "MEDIEVAL": 25,

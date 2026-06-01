@@ -18,6 +18,24 @@
         2000
       ]
     },
+    "HAVE_LOW_GOLD_PER_TURN": {
+      "description": "[0] - minimum gold per turn needed",
+      "params": [
+        50
+      ]
+    },
+    "HAVE_MEDIUM_GOLD_PER_TURN": {
+      "description": "[0] - minimum gold per turn needed",
+      "params": [
+        100
+      ]
+    },
+    "HAVE_HIGH_GOLD_PER_TURN": {
+      "description": "[0] - minimum gold per turn needed",
+      "params": [
+        200
+      ]
+    },
     "HAVE_LOW_STRENGTH": {
       "description": "[0] - minimum strength needed",
       "params": [
