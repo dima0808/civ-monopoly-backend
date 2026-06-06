@@ -27,5 +27,16 @@
       "strength": 200,
       "gold": -700
     }
-  ]
+  ],
+  "science": {
+    "basicTurnAmount": 5,
+    "expeditionTurnAmount": 50,
+    "laserBoost": 10,
+    "cost": 300
+  },
+  "concert": {
+    "cost": 200,
+    "tourismLowerBound": 50,
+    "tourismUpperBound": 150
+  }
 }

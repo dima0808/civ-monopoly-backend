@@ -1,0 +1,19 @@
+package me.civka.monopoly.common;
+
+/** All project choices a member can make. */
+public enum ProjectType {
+  // District-enhancement projects (PROJECTS_EDGE)
+  BREAD_AND_CIRCUSES,
+  CAMPUS_RESEARCH_GRANTS,
+  COMMERCIAL_HUB_INVESTMENT,
+  ENCAMPMENT_TRAINING,
+  HARBOR_SHIPPING,
+  INDUSTRIAL_ZONE_LOGISTICS,
+  THEATER_SQUARE_PERFORMANCES,
+  // Space / science projects (PROJECTS_SCIENCE)
+  LAUNCH_EARTH_SATELLITE,
+  LAUNCH_MOON_LANDING,
+  LAUNCH_MARS_COLONY,
+  EXOPLANET_EXPEDITION,
+  TERRESTRIAL_LASER_STATION
+}

@@ -2,6 +2,7 @@ package me.civka.monopoly.repository.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,6 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.civka.monopoly.common.ScienceProject;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -83,6 +85,23 @@ public class Member {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   private List<Event> events = new ArrayList<>();
+
+  @ElementCollection(targetClass = ScienceProject.class, fetch = FetchType.EAGER)
+  @Enumerated(EnumType.STRING)
+  private List<ScienceProject> finishedScienceProjects = new ArrayList<>();
+
+  @Column(nullable = false)
+  private Integer turnsToNextScienceProject;
+
+  @Column(nullable = false)
+  private Integer expeditionTurns;
+
+  @OneToMany(
+      mappedBy = "member",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private List<AdditionalEffect> additionalEffects = new ArrayList<>();
 
   public enum Civilization {
     RANDOM,

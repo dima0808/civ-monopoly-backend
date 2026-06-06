@@ -25,6 +25,8 @@ public class RoomDto {
   private Integer turnIndex;
   private Boolean isDiceRolled;
   private Integer turn;
+  private String winner;
+  private String victoryType;
   private List<MemberDto> members;
 
   private RoomExtraData ext;

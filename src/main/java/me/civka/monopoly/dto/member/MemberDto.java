@@ -1,5 +1,6 @@
 package me.civka.monopoly.dto.member;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,9 @@ public class MemberDto {
   private Integer strength;
   private Integer tourism;
   private Integer score;
+  private List<String> finishedScienceProjects;
+  private Integer turnsToNextScienceProject;
+  private Integer expeditionTurns;
   private String username;
   private String avatarUrl;
 }

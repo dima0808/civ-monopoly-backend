@@ -8,4 +8,6 @@ public record GameConfiguration(
     Integer goldForPassingRound,
     Integer tourismAdditionalThreshold,
     Map<Era, Integer> eras,
-    List<ArmySpending> armySpending) {}
+    List<ArmySpending> armySpending,
+    Science science,
+    Concert concert) {}

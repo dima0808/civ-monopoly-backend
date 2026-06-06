@@ -4,6 +4,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -18,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.civka.monopoly.common.VictoryType;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,6 +53,11 @@ public class Room {
 
   @Column(nullable = false)
   private Integer turn = 0;
+
+  private String winner;
+
+  @Enumerated(EnumType.STRING)
+  private VictoryType victoryType;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private Chat chat;
