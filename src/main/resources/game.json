@@ -1,5 +1,6 @@
 {
   "goldForPassingRound": 500,
+  "tourismAdditionalThreshold": 800,
   "eras": {
     "CLASSICAL": 10,
     "MEDIEVAL": 25,
