@@ -51,6 +51,11 @@ public class PropertyServiceImpl implements PropertyService {
   private static final double MORTGAGE_RETURN_RATE = 0.4;
   private static final double MORTGAGE_BUYBACK_RATE = 0.6;
 
+  // Government Plaza branches at level 4 into one of three departments. A cell is
+  // a branching cell when its config defines LEVEL_4_1.
+  private static final List<UpgradeType> GOVERNMENT_BRANCH_UPGRADES =
+      List.of(UpgradeType.LEVEL_4_1, UpgradeType.LEVEL_4_2, UpgradeType.LEVEL_4_3);
+
   private final PropertyRepository propertyRepository;
   private final RoomRepository roomRepository;
   private final PropertyMapper propertyMapper;
@@ -101,6 +106,24 @@ public class PropertyServiceImpl implements PropertyService {
       } else {
         UpgradeType highestOwned =
             existing.getUpgrades().stream().max(Enum::compareTo).orElse(UpgradeType.LEVEL_1);
+
+        boolean isBranching = details.upgrades().containsKey(UpgradeType.LEVEL_4_1);
+        if (isBranching && GOVERNMENT_BRANCH_UPGRADES.contains(highestOwned)) {
+          // A department has already been chosen; no further upgrades are available.
+          continue;
+        }
+        if (isBranching && highestOwned == UpgradeType.LEVEL_3) {
+          Map<String, Map<String, Boolean>> branches =
+              branchRequirements(existing, member, room, ownedProperties, details);
+          result.put(
+              position,
+              new PropertyRequirementsDto(
+                  UpgradeType.LEVEL_4_1.name(),
+                  branches.getOrDefault(UpgradeType.LEVEL_4_1.name(), new LinkedHashMap<>()),
+                  branches));
+          continue;
+        }
+
         nextUpgrade = getNextUpgrade(highestOwned);
         if (nextUpgrade == null) {
           continue;
@@ -117,10 +140,34 @@ public class PropertyServiceImpl implements PropertyService {
         }
       }
 
-      result.put(position, new PropertyRequirementsDto(nextUpgrade.name(), requirementResults));
+      result.put(position, new PropertyRequirementsDto(nextUpgrade.name(), requirementResults, null));
     }
 
     return result;
+  }
+
+  private Map<String, Map<String, Boolean>> branchRequirements(
+      Property existing,
+      Member member,
+      Room room,
+      List<Property> ownedProperties,
+      PropertyDetails details) {
+    Map<String, Map<String, Boolean>> branches = new LinkedHashMap<>();
+    for (UpgradeType branch : GOVERNMENT_BRANCH_UPGRADES) {
+      Upgrade upgrade = details.upgrades().get(branch);
+      if (upgrade == null) {
+        continue;
+      }
+      Map<String, Boolean> requirementResults = new LinkedHashMap<>();
+      if (upgrade.requirements() != null) {
+        for (Requirement req : upgrade.requirements()) {
+          requirementResults.put(
+              req.name(), req.isUpgradeAllowed(existing, member, room, ownedProperties));
+        }
+      }
+      branches.put(branch.name(), requirementResults);
+    }
+    return branches;
   }
 
   private UpgradeType getNextUpgrade(UpgradeType current) {
@@ -203,8 +250,16 @@ public class PropertyServiceImpl implements PropertyService {
       throw new UpgradeAlreadyExistsException(upgradeType);
     }
 
-    if (property.getUpgrades().stream()
-        .noneMatch((u) -> u.ordinal() == upgradeType.ordinal() - 1)) { // TODO: add gov plaza check
+    if (GOVERNMENT_BRANCH_UPGRADES.contains(upgradeType)) {
+      boolean ownsLevel3 = property.getUpgrades().contains(UpgradeType.LEVEL_3);
+      boolean ownsDepartment =
+          property.getUpgrades().stream().anyMatch(GOVERNMENT_BRANCH_UPGRADES::contains);
+      if (!ownsLevel3 || ownsDepartment) {
+        throw new UserNotAllowedException(
+            "A Government Plaza department can only be chosen once, from level 3.");
+      }
+    } else if (property.getUpgrades().stream()
+        .noneMatch((u) -> u.ordinal() == upgradeType.ordinal() - 1)) {
       throw new UserNotAllowedException("Upgrades must be purchased in order.");
     }
 

@@ -171,7 +171,7 @@
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Barracks",
+          "name": "Stable",
           "price": 800,
           "gos": 15,
           "gpt": 5,
@@ -1041,7 +1041,7 @@
           "requirements": []
         },
         "LEVEL_2": {
-          "name": "Barracks",
+          "name": "Stable",
           "price": 800,
           "gos": 15,
           "gpt": 5,
