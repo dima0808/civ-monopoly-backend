@@ -44,6 +44,11 @@ public class EventServiceImpl implements EventService {
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
 
+  private static final List<Integer> PROJECTS_EDGE_POSITIONS = List.of(13, 37);
+
+  private static final List<Integer> PROJECT_DISTRICT_POSITIONS =
+      List.of(7, 10, 15, 17, 19, 21, 22, 30, 31, 34, 38, 39, 43, 45, 47);
+
   @Override
   public List<EventDto> getMyEvents() {
     Member member = getMemberFromAuthentication();
@@ -54,6 +59,13 @@ public class EventServiceImpl implements EventService {
   public void handleNewPosition(Member member, int firstRoll, int secondRoll) {
     int position = member.getPosition();
     Room room = member.getRoom();
+
+    if (PROJECTS_EDGE_POSITIONS.contains(position)) {
+      if (hasDistrictForProjects(member)) {
+        addEvent(member, EventType.PROJECTS_EDGE);
+      }
+      return;
+    }
 
     PropertyDetails propertyDetails = propertiesConfiguration.properties().get(position);
     if (propertyDetails == null) {
@@ -139,6 +151,11 @@ public class EventServiceImpl implements EventService {
     }
 
     deleteEvent(member, type);
+  }
+
+  private boolean hasDistrictForProjects(Member member) {
+    return propertyRepository.getPropertiesByMember(member).stream()
+        .anyMatch(property -> PROJECT_DISTRICT_POSITIONS.contains(property.getPosition()));
   }
 
   private void sendEventToUser(Member member, EventMessage eventMessage) {

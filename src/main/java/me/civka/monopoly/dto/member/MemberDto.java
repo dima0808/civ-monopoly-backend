@@ -22,6 +22,7 @@ public class MemberDto {
   private List<String> finishedScienceProjects;
   private Integer turnsToNextScienceProject;
   private Integer expeditionTurns;
+  private List<AdditionalEffectDto> additionalEffects;
   private String username;
   private String avatarUrl;
 }

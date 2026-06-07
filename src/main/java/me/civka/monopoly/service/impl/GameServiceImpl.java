@@ -7,14 +7,18 @@ import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import me.civka.monopoly.common.AdditionalEffectType;
 import me.civka.monopoly.config.ConfigurationHolder;
 import me.civka.monopoly.config.game.ArmySpending;
 import me.civka.monopoly.config.game.GameConfiguration;
+import me.civka.monopoly.repository.entity.AdditionalEffect;
 import me.civka.monopoly.dto.game.CivilizationListDto;
 import me.civka.monopoly.dto.game.ColorListDto;
 import me.civka.monopoly.dto.room.RoomDto;
@@ -158,6 +162,8 @@ public class GameServiceImpl implements GameService {
     int gpt = PropertyUtils.calculateGpt(ownedProperties);
     member.setGold(member.getGold() + gpt);
 
+    member.setGold(member.getGold() + applyAdditionalEffects(member));
+
     memberRepository.save(member);
 
     room.setIsDiceRolled(true);
@@ -197,6 +203,25 @@ public class GameServiceImpl implements GameService {
     delegateTimer(room.getReference());
 
     return roomDto;
+  }
+
+  // Applies per-turn gold income from active additional effects, then ticks down
+  // their remaining turns and removes the ones that just expired.
+  private int applyAdditionalEffects(Member member) {
+    Map<AdditionalEffectType, Integer> goldPerTurn = gameConfiguration.additionalGoldPerTurn();
+    int income = 0;
+    Iterator<AdditionalEffect> iterator = member.getAdditionalEffects().iterator();
+    while (iterator.hasNext()) {
+      AdditionalEffect effect = iterator.next();
+      income += goldPerTurn.getOrDefault(effect.getType(), 0);
+      if (effect.getTurnsLeft() != null && effect.getTurnsLeft() > 0) {
+        effect.setTurnsLeft(effect.getTurnsLeft() - 1);
+        if (effect.getTurnsLeft() == 0) {
+          iterator.remove();
+        }
+      }
+    }
+    return income;
   }
 
   private void applyArmySpending(Member member, int armySpendingIndex) {
