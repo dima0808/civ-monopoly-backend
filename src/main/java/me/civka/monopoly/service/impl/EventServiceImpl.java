@@ -3,6 +3,8 @@ package me.civka.monopoly.service.impl;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,8 @@ public class EventServiceImpl implements EventService {
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
 
+  private static final int TELEPORT_POSITION = 24;
+
   private static final List<Integer> PROJECTS_EDGE_POSITIONS = List.of(13, 37);
 
   private static final List<Integer> PROJECT_DISTRICT_POSITIONS =
@@ -59,6 +63,18 @@ public class EventServiceImpl implements EventService {
   public void handleNewPosition(Member member, int firstRoll, int secondRoll) {
     int position = member.getPosition();
     Room room = member.getRoom();
+
+    if (position == TELEPORT_POSITION) {
+      List<Integer> candidates =
+          new ArrayList<>(propertiesConfiguration.properties().keySet());
+      candidates.remove(Integer.valueOf(TELEPORT_POSITION));
+      Collections.shuffle(candidates);
+      int pos1 = candidates.get(0);
+      int pos2 = candidates.get(1);
+      int pos3 = candidates.get(2);
+      addTeleportEvent(member, pos1, pos2, pos3);
+      return;
+    }
 
     if (PROJECTS_EDGE_POSITIONS.contains(position)) {
       if (hasDistrictForProjects(member)) {
@@ -151,6 +167,17 @@ public class EventServiceImpl implements EventService {
     }
 
     deleteEvent(member, type);
+  }
+
+  private void addTeleportEvent(Member member, int pos1, int pos2, int pos3) {
+    EventExtraData ext = new EventExtraData(pos1, pos2, pos3);
+    Event event = Event.builder().type(EventType.TELEPORT).ext(ext).member(member).build();
+
+    event = eventRepository.save(event);
+    member.getEvents().add(event);
+
+    EventDto eventDto = eventMapper.toEventDto(event);
+    sendEventToUser(member, EventMessage.of(eventDto, MessageType.ADD_EVENT));
   }
 
   private boolean hasDistrictForProjects(Member member) {

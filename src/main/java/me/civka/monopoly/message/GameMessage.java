@@ -15,5 +15,6 @@ public record GameMessage(RoomDto room, MessageType type) {
     ROLL_DICE,
     FORCE_ROLL_DICE,
     NEW_TURN,
+    TELEPORT,
   }
 }

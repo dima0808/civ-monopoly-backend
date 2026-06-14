@@ -84,4 +84,17 @@ public class GameController {
   public RoomDto endTurn(@RequestParam int armySpendingIndex) {
     return gameService.endTurn(armySpendingIndex);
   }
+
+  @Operation(summary = "Teleport to a chosen destination")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Teleported successfully"),
+        @ApiResponse(responseCode = "403", description = "Invalid teleport or not user's turn")
+      })
+  @PostMapping("/teleport")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('USER')")
+  public RoomDto teleport(@RequestParam int position) {
+    return gameService.teleport(position);
+  }
 }

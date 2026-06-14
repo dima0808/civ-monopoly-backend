@@ -29,6 +29,9 @@ import me.civka.monopoly.message.GameMessage.MessageType;
 import me.civka.monopoly.repository.MemberRepository;
 import me.civka.monopoly.repository.PropertyRepository;
 import me.civka.monopoly.repository.RoomRepository;
+import me.civka.monopoly.repository.entity.Event;
+import me.civka.monopoly.repository.entity.Event.EventType;
+import me.civka.monopoly.repository.entity.EventExtraData;
 import me.civka.monopoly.repository.entity.Member;
 import me.civka.monopoly.repository.entity.Member.Civilization;
 import me.civka.monopoly.repository.entity.Property;
@@ -144,6 +147,40 @@ public class GameServiceImpl implements GameService {
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
     handleEndTurn(room, true, DEFAULT_ARMY_SPENDING_INDEX);
+  }
+
+  @Override
+  @Transactional
+  public RoomDto teleport(int position) {
+    Room room = getRoomForTurn();
+
+    if (!room.getIsDiceRolled()) {
+      throw new UserNotAllowedException("User must roll the dice before teleporting.");
+    }
+
+    Member member = room.getMembers().get(room.getTurnIndex());
+    Event teleportEvent = eventService.findByMemberAndType(member, EventType.TELEPORT);
+    if (teleportEvent == null) {
+      throw new UserNotAllowedException("No TELEPORT event found.");
+    }
+
+    EventExtraData ext = teleportEvent.getExt();
+    if (position != ext.getTeleportOption1()
+        && position != ext.getTeleportOption2()
+        && position != ext.getTeleportOption3()) {
+      throw new UserNotAllowedException("Invalid teleport destination.");
+    }
+
+    member.setPosition(position);
+    memberRepository.save(member);
+
+    eventService.deleteEvent(member, EventType.TELEPORT);
+    eventService.handleNewPosition(member, 0, 0);
+
+    RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+    convertAndSendTo(room.getReference(), roomDto, MessageType.TELEPORT);
+
+    return roomDto;
   }
 
   private RoomDto handleRollDice(Room room, boolean isForced) {

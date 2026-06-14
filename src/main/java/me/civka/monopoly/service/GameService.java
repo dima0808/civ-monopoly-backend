@@ -20,4 +20,6 @@ public interface GameService {
   void forceRollDice(UUID roomReference);
 
   void forceEndTurn(UUID roomReference);
+
+  RoomDto teleport(int position);
 }

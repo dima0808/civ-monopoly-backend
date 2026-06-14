@@ -57,6 +57,7 @@ public class Event {
     PROJECTS_EDGE(true),
     PROJECTS_SCIENCE(true),
     PROJECTS_CULTURE(true),
+    TELEPORT(false),
     ALLIANCE(false),
     PEACE(false);
 
