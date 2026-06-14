@@ -17,6 +17,7 @@ import me.civka.monopoly.repository.entity.Authority.AuthorityName;
 import me.civka.monopoly.repository.entity.Chat;
 import me.civka.monopoly.repository.entity.Message;
 import me.civka.monopoly.repository.entity.User;
+import me.civka.monopoly.service.CheatCommandService;
 import me.civka.monopoly.service.PublicChatService;
 import me.civka.monopoly.service.exception.chat.ChatNotFoundException;
 import me.civka.monopoly.service.exception.member.MessageNotFoundException;
@@ -41,6 +42,7 @@ public class PublicChatServiceImpl implements PublicChatService {
   private final MessageMapper messageMapper;
   private final MessageRepository messageRepository;
   private final SimpMessagingTemplate messagingTemplate;
+  private final CheatCommandService cheatCommandService;
 
   @Value("${app.chat.public-chat-reference}")
   private String publicChatReference;
@@ -108,6 +110,11 @@ public class PublicChatServiceImpl implements PublicChatService {
     MessageDto messageDto = messageMapper.toMessageDto(message);
 
     broadcastChatMessage(chatReference, messageDto, MessageType.SEND);
+
+    String messageText = messageRequestDto.getMessage();
+    if (messageText.startsWith("/") && sender.hasAuthority(AuthorityName.ROLE_ADMIN)) {
+      cheatCommandService.processCommand(messageText, sender, chat);
+    }
 
     return messageDto;
   }
