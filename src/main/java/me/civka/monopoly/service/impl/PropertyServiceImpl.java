@@ -63,6 +63,7 @@ public class PropertyServiceImpl implements PropertyService {
   private final MemberRepository memberRepository;
   private final EventService eventService;
   private final SimpMessagingTemplate messagingTemplate;
+  private final BonusService bonusService;
 
   private final PropertiesConfiguration propertiesConfiguration =
       ConfigurationHolder.propertiesConfiguration();
@@ -186,9 +187,7 @@ public class PropertyServiceImpl implements PropertyService {
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
-    return propertyRepository.getPropertiesByRoom(room).stream()
-        .map(propertyMapper::toPropertyDto)
-        .toList();
+    return propertyMapper.toPropertyDto(propertyRepository.getPropertiesByRoom(room));
   }
 
   @Override
@@ -229,10 +228,16 @@ public class PropertyServiceImpl implements PropertyService {
             .room(room)
             .build();
 
-    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    propertyRepository.save(property);
+    List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
+    List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
+    List<PropertyDto> bonusUpdateDtos =
+        bonusChanged.stream().map(propertyMapper::toPropertyDto).toList();
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
     eventService.deleteEvent(member, EventType.BUY_PROPERTY);
     sendPropertyMessage(
-        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_BUY);
+        room, propertyDto, bonusUpdateDtos, List.of(member),
+        PropertyMessage.MessageType.PROPERTY_BUY);
     return propertyDto;
   }
 
@@ -281,9 +286,15 @@ public class PropertyServiceImpl implements PropertyService {
     property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
-    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    propertyRepository.save(property);
+    List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
+    List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
+    List<PropertyDto> bonusUpdateDtos =
+        bonusChanged.stream().map(propertyMapper::toPropertyDto).toList();
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
     sendPropertyMessage(
-        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_UPGRADE);
+        room, propertyDto, bonusUpdateDtos, List.of(member),
+        PropertyMessage.MessageType.PROPERTY_UPGRADE);
     return propertyDto;
   }
 
@@ -318,9 +329,15 @@ public class PropertyServiceImpl implements PropertyService {
     property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
-    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    propertyRepository.save(property);
+    List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
+    List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
+    List<PropertyDto> bonusUpdateDtos =
+        bonusChanged.stream().map(propertyMapper::toPropertyDto).toList();
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
     sendPropertyMessage(
-        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_MORTGAGE);
+        room, propertyDto, bonusUpdateDtos, List.of(member),
+        PropertyMessage.MessageType.PROPERTY_MORTGAGE);
     return propertyDto;
   }
 
@@ -352,9 +369,15 @@ public class PropertyServiceImpl implements PropertyService {
     property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
-    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    propertyRepository.save(property);
+    List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
+    List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
+    List<PropertyDto> bonusUpdateDtos =
+        bonusChanged.stream().map(propertyMapper::toPropertyDto).toList();
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
     sendPropertyMessage(
-        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_DEMOTE);
+        room, propertyDto, bonusUpdateDtos, List.of(member),
+        PropertyMessage.MessageType.PROPERTY_DEMOTE);
     return propertyDto;
   }
 
@@ -397,9 +420,15 @@ public class PropertyServiceImpl implements PropertyService {
     property.setRoundOfLastChange(member.getRoundsMade());
 
     memberRepository.save(member);
-    PropertyDto propertyDto = propertyMapper.toPropertyDto(propertyRepository.save(property));
+    propertyRepository.save(property);
+    List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
+    List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
+    List<PropertyDto> bonusUpdateDtos =
+        bonusChanged.stream().map(propertyMapper::toPropertyDto).toList();
+    PropertyDto propertyDto = propertyMapper.toPropertyDto(property);
     sendPropertyMessage(
-        room, propertyDto, List.of(member), PropertyMessage.MessageType.PROPERTY_BUYBACK);
+        room, propertyDto, bonusUpdateDtos, List.of(member),
+        PropertyMessage.MessageType.PROPERTY_BUYBACK);
     return propertyDto;
   }
 
@@ -463,9 +492,19 @@ public class PropertyServiceImpl implements PropertyService {
       PropertyDto propertyDto,
       List<Member> affectedMembers,
       PropertyMessage.MessageType type) {
+    sendPropertyMessage(room, propertyDto, null, affectedMembers, type);
+  }
+
+  private void sendPropertyMessage(
+      Room room,
+      PropertyDto propertyDto,
+      List<PropertyDto> bonusUpdates,
+      List<Member> affectedMembers,
+      PropertyMessage.MessageType type) {
     List<MemberDto> memberDtos = affectedMembers.stream().map(memberMapper::toMemberDto).toList();
     messagingTemplate.convertAndSend(
-        "/topic/games/" + room.getReference(), PropertyMessage.of(propertyDto, memberDtos, type));
+        "/topic/games/" + room.getReference(),
+        PropertyMessage.of(propertyDto, bonusUpdates, memberDtos, type));
   }
 
   private int checkForPrice(Member member, int position, UpgradeType upgradeType) {

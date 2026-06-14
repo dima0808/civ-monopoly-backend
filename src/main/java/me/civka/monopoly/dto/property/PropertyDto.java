@@ -20,5 +20,6 @@ public class PropertyDto {
   private Integer position;
   private Integer mortgage;
   private List<String> upgrades;
+  private List<String> bonuses;
   private MemberDto member;
 }

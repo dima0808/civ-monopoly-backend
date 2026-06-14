@@ -84,6 +84,9 @@ public class PropertyUtils {
 
     int gpt = 0;
     for (Property property : ownedProperties) {
+      if (property.getMortgage() != -1) {
+        continue;
+      }
       PropertyDetails propertyDetail = properties.get(property.getPosition());
       gpt +=
           property.getUpgrades().stream()
