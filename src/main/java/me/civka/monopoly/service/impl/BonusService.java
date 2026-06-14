@@ -69,11 +69,11 @@ public class BonusService {
   private List<BonusType> computeBonuses(Property property, Map<Integer, Property> propMap) {
     PropertyDetails details = propertiesConfiguration.properties().get(property.getPosition());
     if (details == null || details.bonuses() == null || details.bonuses().isEmpty()) {
-      return List.of();
+      return new ArrayList<>();
     }
 
     if (property.getMortgage() != -1) {
-      return List.of();
+      return new ArrayList<>();
     }
 
     List<BonusType> bonuses = new ArrayList<>();

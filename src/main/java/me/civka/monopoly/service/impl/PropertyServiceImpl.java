@@ -3,6 +3,7 @@ package me.civka.monopoly.service.impl;
 import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,8 +223,8 @@ public class PropertyServiceImpl implements PropertyService {
             .mortgage(-1)
             .turnOfLastChange(room.getTurn())
             .roundOfLastChange(member.getRoundsMade())
-            .upgrades(List.of(UpgradeType.LEVEL_1))
-            .bonuses(List.of())
+            .upgrades(new ArrayList<>(List.of(UpgradeType.LEVEL_1)))
+            .bonuses(new ArrayList<>())
             .member(memberRepository.save(member))
             .room(room)
             .build();

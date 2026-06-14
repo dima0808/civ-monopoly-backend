@@ -374,7 +374,11 @@ public enum Requirement implements RequirementService {
   },
 
   HAVE_RESEARCH_GRANTS {
-    // TODO: implement
+    @Override
+    public boolean isUpgradeAllowed(
+        Property propertyToUpgrade, Member member, Room room, List<Property> ownedProperties) {
+      return member.getFinishedScienceProjects().contains(ScienceProject.CAMPUS);
+    }
   },
 
   ON_CLASSICAL_ERA {
