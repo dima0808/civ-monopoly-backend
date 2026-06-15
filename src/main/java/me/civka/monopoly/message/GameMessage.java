@@ -17,5 +17,6 @@ public record GameMessage(RoomDto room, MessageType type) {
     NEW_TURN,
     TELEPORT,
     CHEAT,
+    GAME_OVER,
   }
 }

@@ -1,4 +1,6 @@
 {
+  "maxTurns": 150,
+  "militaryTarget": 30,
   "goldForPassingRound": 500,
   "tourismAdditionalThreshold": 800,
   "eras": {

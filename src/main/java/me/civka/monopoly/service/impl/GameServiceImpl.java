@@ -7,12 +7,15 @@ import static me.civka.monopoly.util.GameUtils.getMemberFromAuthentication;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import me.civka.monopoly.common.ScienceProject;
+import me.civka.monopoly.common.VictoryType;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.AdditionalEffectType;
 import me.civka.monopoly.config.ConfigurationHolder;
@@ -135,6 +138,8 @@ public class GameServiceImpl implements GameService {
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
 
+    if (room.getWinner() != null) return;
+
     handleRollDice(room, true);
   }
 
@@ -145,6 +150,8 @@ public class GameServiceImpl implements GameService {
         roomRepository
             .findById(roomReference)
             .orElseThrow(() -> new RoomNotFoundException(roomReference));
+
+    if (room.getWinner() != null) return;
 
     handleEndTurn(room, true, DEFAULT_ARMY_SPENDING_INDEX);
   }
@@ -246,7 +253,19 @@ public class GameServiceImpl implements GameService {
 
     applyArmySpending(member, armySpendingIndex);
 
+    if (checkVictoryConditions(room, member)) {
+      RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+      convertAndSendTo(room.getReference(), roomDto, MessageType.GAME_OVER);
+      return roomDto;
+    }
+
     delegateNextTurn(room);
+
+    if (room.getWinner() != null) {
+      RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
+      convertAndSendTo(room.getReference(), roomDto, MessageType.GAME_OVER);
+      return roomDto;
+    }
 
     RoomDto roomDto = roomMapper.toRoomDto(roomRepository.save(room));
     convertAndSendTo(
@@ -341,6 +360,14 @@ public class GameServiceImpl implements GameService {
       room.setTurnIndex((room.getTurnIndex() + 1) % room.getMembers().size());
       if (room.getTurnIndex().equals(room.getState().getFirstTurnIndex())) {
         room.setTurn(room.getTurn() + 1);
+        if (room.getTurn() >= gameConfiguration.maxTurns()) {
+          Member topScorer = room.getMembers().stream()
+              .max(Comparator.comparingInt(Member::getScore))
+              .orElse(null);
+          if (topScorer != null) {
+            setWinner(room, topScorer, VictoryType.SCORE);
+          }
+        }
         convertAndSendTo(room.getReference(), roomMapper.toRoomDto(room), MessageType.NEW_TURN);
         checkForMortgage(room);
       }
@@ -398,11 +425,46 @@ public class GameServiceImpl implements GameService {
       throw new UserNotAllowedException("Game has not been started yet.");
     }
 
+    if (room.getWinner() != null) {
+      throw new UserNotAllowedException("Game is over.");
+    }
+
     if (!member.equalsById(room.getMembers().get(room.getTurnIndex()))) {
       throw new UserNotAllowedException("It is not user's turn.");
     }
 
     return room;
+  }
+
+  private boolean checkVictoryConditions(Room room, Member member) {
+    int propertyCount = propertyRepository.getPropertiesByMember(member).size();
+    if (propertyCount >= gameConfiguration.militaryTarget()) {
+      return setWinner(room, member, VictoryType.MILITARY);
+    }
+
+    int maxOther = room.getMembers().stream()
+        .filter(m -> !m.equalsById(member))
+        .mapToInt(Member::getTourism)
+        .max().orElse(0);
+    if (member.getTourism() >= 2 * maxOther + gameConfiguration.tourismAdditionalThreshold()) {
+      return setWinner(room, member, VictoryType.CULTURE);
+    }
+
+    var finished = member.getFinishedScienceProjects();
+    boolean allMilestones = finished.containsAll(
+        List.of(ScienceProject.SATELLITE, ScienceProject.MOON,
+                ScienceProject.MARS, ScienceProject.EXOPLANET));
+    if (allMilestones && member.getExpeditionTurns() != null && member.getExpeditionTurns() == 0) {
+      return setWinner(room, member, VictoryType.SCIENCE);
+    }
+
+    return false;
+  }
+
+  private boolean setWinner(Room room, Member member, VictoryType type) {
+    room.setWinner(member.getUser().getUsername());
+    room.setVictoryType(type);
+    return true;
   }
 
   private void convertAndSendTo(UUID roomReference, RoomDto memberDto, MessageType type) {

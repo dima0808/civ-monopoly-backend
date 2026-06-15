@@ -7,6 +7,8 @@ import me.civka.monopoly.common.Era;
 import me.civka.monopoly.common.ProjectType;
 
 public record GameConfiguration(
+    Integer maxTurns,
+    Integer militaryTarget,
     Integer goldForPassingRound,
     Integer tourismAdditionalThreshold,
     Map<Era, Integer> eras,
