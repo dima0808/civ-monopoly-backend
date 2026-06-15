@@ -201,6 +201,14 @@ public class GameServiceImpl implements GameService {
 
     member.setGold(member.getGold() + applyAdditionalEffects(member));
 
+    if (member.getTurnsToNextScienceProject() > 0) {
+      member.setTurnsToNextScienceProject(member.getTurnsToNextScienceProject() - 1);
+    }
+
+    if (member.getExpeditionTurns() != null && member.getExpeditionTurns() > 0) {
+      member.setExpeditionTurns(member.getExpeditionTurns() - 1);
+    }
+
     memberRepository.save(member);
 
     room.setIsDiceRolled(true);
@@ -212,6 +220,13 @@ public class GameServiceImpl implements GameService {
         isForced ? MessageType.FORCE_ROLL_DICE : MessageType.ROLL_DICE);
 
     eventService.handleNewPosition(member, firstRoll, secondRoll);
+
+    if (member.getTurnsToNextScienceProject() != -1
+        && member.getTurnsToNextScienceProject() - calculateScienceBoost(member) <= 0) {
+      member.setTurnsToNextScienceProject(gameConfiguration.science().basicTurnAmount());
+      memberRepository.save(member);
+      eventService.addEvent(member, Event.EventType.PROJECTS_SCIENCE);
+    }
 
     delegateTimer(room.getReference());
 
@@ -259,6 +274,34 @@ public class GameServiceImpl implements GameService {
       }
     }
     return income;
+  }
+
+  private int calculateScienceBoost(Member member) {
+    var science = gameConfiguration.science();
+    List<Property> owned = propertyRepository.getPropertiesByMember(member);
+    List<Integer> campusPositions = PropertyUtils.getPositionByName("Campus");
+    List<Integer> govPlazaPositions = PropertyUtils.getPositionByName("Government Plaza");
+
+    int boost = 0;
+    for (Property p : owned) {
+      if (p.getMortgage() != -1) continue;
+      int pos = p.getPosition();
+      if (campusPositions.contains(pos)
+          && p.getUpgrades().contains(Property.UpgradeType.LEVEL_4)) {
+        boost += science.labBoost();
+      }
+      if (govPlazaPositions.contains(pos)
+          && p.getUpgrades().contains(Property.UpgradeType.LEVEL_4_1)) {
+        boost += science.governmentBoost();
+      }
+      if (pos == 46) {
+        boost += science.oxfordBoost();
+      }
+      if (pos == 47) {
+        boost += science.spaceportBoost();
+      }
+    }
+    return boost;
   }
 
   private void applyArmySpending(Member member, int armySpendingIndex) {

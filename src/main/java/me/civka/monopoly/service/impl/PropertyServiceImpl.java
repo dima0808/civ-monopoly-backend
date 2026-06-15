@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.PropertyType;
 import me.civka.monopoly.common.Requirement;
+import me.civka.monopoly.common.ScienceProject;
 import me.civka.monopoly.config.ConfigurationHolder;
 import me.civka.monopoly.config.properties.PropertiesConfiguration;
 import me.civka.monopoly.config.properties.PropertyDetails;
@@ -230,6 +231,15 @@ public class PropertyServiceImpl implements PropertyService {
             .build();
 
     propertyRepository.save(property);
+
+    if (position == 47
+        && !member.getFinishedScienceProjects().contains(ScienceProject.CAMPUS)) {
+      member.getFinishedScienceProjects().add(ScienceProject.CAMPUS);
+      member.setTurnsToNextScienceProject(
+          ConfigurationHolder.gameConfiguration().science().basicTurnAmount());
+      memberRepository.save(member);
+    }
+
     List<Property> allMemberProperties = propertyRepository.getPropertiesByMember(member);
     List<Property> bonusChanged = bonusService.recalculateBonuses(allMemberProperties, position);
     List<PropertyDto> bonusUpdateDtos =

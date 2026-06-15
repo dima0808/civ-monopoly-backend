@@ -32,7 +32,11 @@
     "basicTurnAmount": 12,
     "expeditionTurnAmount": 50,
     "laserBoost": 4,
-    "cost": 800
+    "cost": 800,
+    "labBoost": 2,
+    "governmentBoost": 2,
+    "oxfordBoost": 1,
+    "spaceportBoost": 3
   },
   "concert": {
     "cost": 1000,

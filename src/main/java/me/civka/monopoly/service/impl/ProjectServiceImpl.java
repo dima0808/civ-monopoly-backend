@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import me.civka.monopoly.common.AdditionalEffectType;
+import me.civka.monopoly.common.Era;
 import me.civka.monopoly.common.ProjectType;
 import me.civka.monopoly.common.ScienceProject;
 import me.civka.monopoly.config.ConfigurationHolder;
@@ -80,7 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
           member.setTourism(
               member.getTourism() + districtAmount(member, projectType, THEATER_SQUARE));
       case COMMERCIAL_HUB_INVESTMENT -> applyCommercialHubInvestment(member);
-      case CAMPUS_RESEARCH_GRANTS -> grantCampusResearch(member);
+      case CAMPUS_RESEARCH_GRANTS -> grantCampusResearch(member, room);
       case LAUNCH_EARTH_SATELLITE -> performScienceProject(member, ScienceProject.SATELLITE, false);
       case LAUNCH_MOON_LANDING -> performScienceProject(member, ScienceProject.MOON, false);
       case LAUNCH_MARS_COLONY -> performScienceProject(member, ScienceProject.MARS, false);
@@ -180,7 +181,9 @@ public class ProjectServiceImpl implements ProjectService {
       member.setGold(member.getGold() - science.cost());
     }
 
-    member.getFinishedScienceProjects().add(next);
+    if (next != ScienceProject.LASER) {
+      member.getFinishedScienceProjects().add(next);
+    }
     if (next == ScienceProject.EXOPLANET) {
       member.setExpeditionTurns(science.expeditionTurnAmount());
     } else if (next == ScienceProject.LASER) {
@@ -189,11 +192,15 @@ public class ProjectServiceImpl implements ProjectService {
     member.setTurnsToNextScienceProject(science.basicTurnAmount());
   }
 
-  private void grantCampusResearch(Member member) {
+  private void grantCampusResearch(Member member, Room room) {
     if (member.getFinishedScienceProjects().contains(ScienceProject.CAMPUS)) {
       throw new UserNotAllowedException("Research grants already obtained.");
     }
+    if (room.getTurn() < gameConfiguration.eras().get(Era.MODERN)) {
+      throw new UserNotAllowedException("Campus research grants require Modern era.");
+    }
     member.getFinishedScienceProjects().add(ScienceProject.CAMPUS);
+    member.setTurnsToNextScienceProject(gameConfiguration.science().basicTurnAmount());
   }
 
   private boolean canDoScience(Member member) {
