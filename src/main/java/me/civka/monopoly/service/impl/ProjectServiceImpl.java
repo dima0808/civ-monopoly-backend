@@ -81,9 +81,11 @@ public class ProjectServiceImpl implements ProjectService {
               member.getTourism() + districtAmount(member, projectType, THEATER_SQUARE));
       case COMMERCIAL_HUB_INVESTMENT -> applyCommercialHubInvestment(member);
       case CAMPUS_RESEARCH_GRANTS -> grantCampusResearch(member);
-      // TODO: BREAD_AND_CIRCUSES (opponent mortgage pressure) and
-      // INDUSTRIAL_ZONE_LOGISTICS (wonder discount) depend on systems not yet
-      // ported; space launches advance through doScienceProject. See PROJECTS_PLAN.md.
+      case LAUNCH_EARTH_SATELLITE -> performScienceProject(member, ScienceProject.SATELLITE, false);
+      case LAUNCH_MOON_LANDING -> performScienceProject(member, ScienceProject.MOON, false);
+      case LAUNCH_MARS_COLONY -> performScienceProject(member, ScienceProject.MARS, false);
+      case EXOPLANET_EXPEDITION -> performScienceProject(member, ScienceProject.EXOPLANET, false);
+      case TERRESTRIAL_LASER_STATION -> performScienceProject(member, ScienceProject.LASER, false);
       default ->
           throw new UserNotAllowedException("Project " + projectType + " is not supported yet.");
     }
@@ -100,30 +102,7 @@ public class ProjectServiceImpl implements ProjectService {
     checkForCurrentTurn(member, room);
     requireEvent(member, EventType.PROJECTS_SCIENCE);
 
-    if (!canDoScience(member)) {
-      throw new UserNotAllowedException(
-          "Member cannot perform a science project (needs research grants and a spaceport or a"
-              + " level 4 campus).");
-    }
-
-    ScienceProject next = nextScienceProject(member);
-    if (next == null || next == ScienceProject.CAMPUS) {
-      throw new UserNotAllowedException("No science project available.");
-    }
-
-    Science science = gameConfiguration.science();
-    if (member.getGold() < science.cost()) {
-      throw new UserNotAllowedException("Member does not have enough gold for a science project.");
-    }
-    member.setGold(member.getGold() - science.cost());
-
-    member.getFinishedScienceProjects().add(next);
-    if (next == ScienceProject.EXOPLANET) {
-      member.setExpeditionTurns(science.expeditionTurnAmount());
-    } else if (next == ScienceProject.LASER) {
-      member.setExpeditionTurns(Math.max(member.getExpeditionTurns() - science.laserBoost(), 0));
-    }
-    member.setTurnsToNextScienceProject(science.basicTurnAmount());
+    performScienceProject(member, null, true);
 
     memberRepository.save(member);
     eventService.deleteEvent(member, EventType.PROJECTS_SCIENCE);
@@ -169,6 +148,45 @@ public class ProjectServiceImpl implements ProjectService {
             .build();
     additionalEffectRepository.save(effect);
     member.getAdditionalEffects().add(effect);
+  }
+
+  /**
+   * @param target the specific science project to perform, or {@code null} to auto-select next
+   * @param chargeGold whether to deduct gold cost (true for science tile, false for project tile)
+   */
+  private void performScienceProject(Member member, ScienceProject target, boolean chargeGold) {
+    if (!canDoScience(member)) {
+      throw new UserNotAllowedException(
+          "Member cannot perform a science project (needs research grants and a spaceport or a"
+              + " level 4 campus).");
+    }
+
+    ScienceProject next = nextScienceProject(member);
+    if (next == null || next == ScienceProject.CAMPUS) {
+      throw new UserNotAllowedException("No science project available.");
+    }
+
+    if (target != null && target != next) {
+      throw new UserNotAllowedException(
+          "Cannot perform " + target + "; complete " + next + " first.");
+    }
+
+    Science science = gameConfiguration.science();
+    if (chargeGold) {
+      if (member.getGold() < science.cost()) {
+        throw new UserNotAllowedException(
+            "Member does not have enough gold for a science project.");
+      }
+      member.setGold(member.getGold() - science.cost());
+    }
+
+    member.getFinishedScienceProjects().add(next);
+    if (next == ScienceProject.EXOPLANET) {
+      member.setExpeditionTurns(science.expeditionTurnAmount());
+    } else if (next == ScienceProject.LASER) {
+      member.setExpeditionTurns(Math.max(member.getExpeditionTurns() - science.laserBoost(), 0));
+    }
+    member.setTurnsToNextScienceProject(science.basicTurnAmount());
   }
 
   private void grantCampusResearch(Member member) {
